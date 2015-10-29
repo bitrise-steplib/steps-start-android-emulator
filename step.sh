@@ -1,5 +1,7 @@
 #!/bin/bash
 
+THIS_SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 set -e
 
 if [ -z "${emulator_name}" ]; then
@@ -7,4 +9,4 @@ if [ -z "${emulator_name}" ]; then
 	exit 1
 fi
 
-ruby ./emulator.rb
+ruby ${THIS_SCRIPTDIR}/emulator.rb
