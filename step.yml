@@ -7,7 +7,7 @@ website: https://github.com/bitrise-io/steps-start-android-emulator
 source_code_url: https://github.com/bitrise-io/steps-start-android-emulator
 support_url: https://github.com/bitrise-io/steps-start-android-emulator/issues
 host_os_tags:
-  - "osx-10.10"
+  - "ubuntu"
 project_type_tags:
   - android
 type_tags:
@@ -21,5 +21,5 @@ inputs:
       title: "Emulator to boot"
       description: |
         Emulator to boot
-      is_required: false
+      is_required: true
       is_expand: true
