@@ -5,3 +5,9 @@ workflows:
   test:
     steps:
     - path::./:
+        inputs:
+        - emulator_name: AVD_for_Nexus_4_by_Google
+    - script:
+        inputs:
+        - content: |
+            echo "BITRISE_EMULATOR_SERIAL: ${BITRISE_EMULATOR_SERIAL}"

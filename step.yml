@@ -23,3 +23,8 @@ inputs:
         Emulator to boot
       is_required: true
       is_expand: true
+outputs:
+  - BITRISE_EMULATOR_SERIAL:
+    opts:
+      title: "Emulator serial"
+      description: "Booted emulator serial"
