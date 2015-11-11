@@ -114,11 +114,11 @@ unless emulator_serial
   puts
   puts '=> Get emulator serial'
   emulator_serial = emulator_serial!(emulator_uuid)
-
-  puts
-  puts '=> Wait till device is booted'
-  ensure_emulator_booted!(emulator_serial)
 end
+
+puts
+puts '=> Ensure device is booted'
+ensure_emulator_booted!(emulator_serial)
 
 puts
 puts "(i) Emulator running wit serial: #{emulator_serial}"
