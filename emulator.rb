@@ -55,7 +55,7 @@ def avd_image_serial(avd_name)
 end
 
 def start_emulator(avd_name, uuid)
-  emulator = File.join(ENV['HOME'], 'Library/Android/sdk/tools/emulator')
+  emulator = File.join(ENV['HOME'], 'Library/Developer/Xamarin/android-sdk-macosx/tools/emulator')
   pid = spawn("#{emulator} -avd #{avd_name} -no-skin -noaudio -no-window -prop emu.uuid=#{uuid}", [:out, :err] => ['emulator.log', 'w'])
   Process.detach(pid)
 end
