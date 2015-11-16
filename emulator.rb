@@ -80,9 +80,9 @@ def emulator_serial!(uuid)
 end
 
 def ensure_emulator_booted!(serial)
-  Timeout.timeout(240) do
+  Timeout.timeout(500) do
     loop do
-      sleep 5
+      sleep 10
 
       dev_boot_complete_out = `#{@adb} -s #{serial} shell "getprop dev.bootcomplete"`.strip
       sys_boot_complete_out = `#{@adb} -s #{serial} shell "getprop sys.boot_completed"`.strip
