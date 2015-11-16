@@ -61,7 +61,7 @@ def start_emulator(avd_name, uuid)
 end
 
 def emulator_serial!(uuid)
-  Timeout.timeout(120) do
+  Timeout.timeout(240) do
     loop do
       sleep 5
       devices = `#{@adb} devices -l`.split("\n")
@@ -80,7 +80,7 @@ def emulator_serial!(uuid)
 end
 
 def ensure_emulator_booted!(serial)
-  Timeout.timeout(120) do
+  Timeout.timeout(240) do
     loop do
       sleep 5
 
