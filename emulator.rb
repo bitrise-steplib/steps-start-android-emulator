@@ -2,7 +2,8 @@ require 'securerandom'
 require 'timeout'
 require 'net/telnet'
 
-@adb = File.join(ENV['HOME'], 'Library/Developer/Xamarin/android-sdk-macosx/platform-tools/adb')
+@adb = File.join(ENV['android_home'], 'platform-tools/adb')
+puts "(i) adb: #{@adb}"
 
 # -----------------------
 # --- functions
@@ -55,7 +56,8 @@ def avd_image_serial(avd_name)
 end
 
 def start_emulator(avd_name, uuid)
-  emulator = File.join(ENV['HOME'], 'Library/Developer/Xamarin/android-sdk-macosx/tools/emulator')
+  emulator = File.join(ENV['android_home'], 'tools/emulator')
+  puts "(i) emulator: #{emulator}"
   pid = spawn("#{emulator} -avd #{avd_name} -no-skin -noaudio -no-window -prop emu.uuid=#{uuid}", [:out, :err] => ['emulator.log', 'w'])
   Process.detach(pid)
 end
