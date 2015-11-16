@@ -23,6 +23,12 @@ inputs:
         Emulator to boot
       is_required: true
       is_expand: true
+  - android_home: $ANDROID_HOME
+    opts:
+      title: "Android sdk path"
+      description: "Android sdk path"
+      is_required: true
+      is_expand: true
 outputs:
   - BITRISE_EMULATOR_SERIAL:
     opts:

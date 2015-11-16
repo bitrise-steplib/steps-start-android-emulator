@@ -2,7 +2,8 @@ require 'securerandom'
 require 'timeout'
 require 'net/telnet'
 
-@adb = File.join(ENV['HOME'], 'Library/Android/sdk/platform-tools/adb')
+@adb = File.join(ENV['android_home'], 'platform-tools/adb')
+puts "(i) adb: #{@adb}"
 
 # -----------------------
 # --- functions
@@ -55,13 +56,14 @@ def avd_image_serial(avd_name)
 end
 
 def start_emulator(avd_name, uuid)
-  emulator = File.join(ENV['HOME'], 'Library/Android/sdk/tools/emulator')
+  emulator = File.join(ENV['android_home'], 'tools/emulator')
+  puts "(i) emulator: #{emulator}"
   pid = spawn("#{emulator} -avd #{avd_name} -no-skin -noaudio -no-window -prop emu.uuid=#{uuid}", [:out, :err] => ['emulator.log', 'w'])
   Process.detach(pid)
 end
 
 def emulator_serial!(uuid)
-  Timeout.timeout(120) do
+  Timeout.timeout(240) do
     loop do
       sleep 5
       devices = `#{@adb} devices -l`.split("\n")
@@ -80,9 +82,9 @@ def emulator_serial!(uuid)
 end
 
 def ensure_emulator_booted!(serial)
-  Timeout.timeout(120) do
+  Timeout.timeout(500) do
     loop do
-      sleep 5
+      sleep 10
 
       dev_boot_complete_out = `#{@adb} -s #{serial} shell "getprop dev.bootcomplete"`.strip
       sys_boot_complete_out = `#{@adb} -s #{serial} shell "getprop sys.boot_completed"`.strip

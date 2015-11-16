@@ -6,7 +6,8 @@ workflows:
     steps:
     - path::./:
         inputs:
-        - emulator_name: AVD_for_Nexus_4_by_Google
+        - emulator_name: $EMULATOR_NAME
+        - android_home: $ANDROID_HOME
     - script:
         inputs:
         - content: |
