@@ -2,7 +2,7 @@ require 'securerandom'
 require 'timeout'
 require 'net/telnet'
 
-@adb = File.join(ENV['HOME'], 'Library/Android/sdk/platform-tools/adb')
+@adb = File.join(ENV['HOME'], 'Library/Developer/Xamarin/android-sdk-macosx/platform-tools/adb')
 
 # -----------------------
 # --- functions
