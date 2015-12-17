@@ -1,13 +1,12 @@
 title: Start Android emulator
-summary: |-
-  Start Android emulator and wait till it's booted fully
+summary: Start Android emulator and wait till it's booted fully.
 description: |-
-  Start Android emulator and wait till it's booted fully
-website: https://github.com/bitrise-io/steps-start-android-emulator
-source_code_url: https://github.com/bitrise-io/steps-start-android-emulator
-support_url: https://github.com/bitrise-io/steps-start-android-emulator/issues
+  Start Android emulator and wait till it's booted fully.
+website: https://github.com/bitrise-steplib/steps-start-android-emulator
+source_code_url: https://github.com/bitrise-steplib/steps-start-android-emulator
+support_url: https://github.com/bitrise-steplib/steps-start-android-emulator/issues
 host_os_tags:
-  - "ubuntu"
+  - ubuntu
 project_type_tags:
   - android
 type_tags:
