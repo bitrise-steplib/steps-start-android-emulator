@@ -57,7 +57,14 @@ end
 
 def start_emulator(avd_name, uuid)
   emulator = File.join(ENV['android_home'], 'tools/emulator')
-  pid = spawn("#{emulator} -force-32bit -avd #{avd_name} -no-boot-anim -no-skin -noaudio -no-window -prop emu.uuid=#{uuid}", [:out, :err] => ['emulator.log', 'w'])
+  os = `uname -s`
+  puts "os: #{os}"
+
+  cmd = "#{emulator} -avd #{avd_name} -no-boot-anim -no-skin -noaudio -no-window -prop emu.uuid=#{uuid}"
+  cmd += ' -force-32bit' if os.include? 'Linux'
+  puts "cmd: #{cmd}"
+
+  pid = spawn(cmd, [:out, :err] => ['emulator.log', 'w'])
   Process.detach(pid)
 end
 
