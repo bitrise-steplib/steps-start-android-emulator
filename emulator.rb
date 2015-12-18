@@ -69,12 +69,13 @@ def start_emulator(avd_name, uuid)
 end
 
 def emulator_serial!(uuid)
-  Timeout.timeout(240) do
+  Timeout.timeout(600) do
     loop do
       sleep 5
       devices = `#{@adb} devices -l`.split("\n")
 
       devices.each do |device|
+
         match = device.match(/^(?<emulator>emulator-\d*)/)
         next unless match
 
@@ -88,7 +89,7 @@ def emulator_serial!(uuid)
 end
 
 def ensure_emulator_booted!(serial)
-  Timeout.timeout(500) do
+  Timeout.timeout(600) do
     loop do
       sleep 10
 
