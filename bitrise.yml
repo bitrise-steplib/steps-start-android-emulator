@@ -4,6 +4,17 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 workflows:
   test:
     steps:
+    - script:
+        title: Create AVD
+        inputs:
+        - content: |-
+            #!/bin/bash
+
+            echo "Create AVD"
+            emulator_name=emulator-android-21
+            echo no | android create avd --force -n $emulator_name -t android-21 --abi armeabi-v7a
+
+            envman add --key EMULATOR_NAME --value $emulator_name
     - path::./:
         inputs:
         - emulator_name: $EMULATOR_NAME
