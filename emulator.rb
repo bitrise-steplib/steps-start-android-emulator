@@ -1,12 +1,14 @@
-require 'securerandom'
 require 'timeout'
-require 'net/telnet'
+
+# -----------------------
+# --- Constants
+# -----------------------
 
 @adb = File.join(ENV['android_home'], 'platform-tools/adb')
 puts "(i) adb: #{@adb}"
 
 # -----------------------
-# --- functions
+# --- Functions
 # -----------------------
 
 def list_of_avd_images
@@ -29,117 +31,180 @@ def list_of_avd_images
   images_names
 end
 
-def avd_name_match?(avd_name, port)
-  telnet = Net::Telnet.new('Host' => 'localhost',
-                           'Port' => port,
-                           'Timeout' => 15,
-                           'Binmode' => true)
+def emulator_list
+  command = "#{@adb} devices 2>&1"
+  output = %x(#{command}).strip
 
-  match = false
+  return [] unless output
 
-  telnet.puts('avd name')
-  telnet.waitfor('Match' => /OK/) { |c| match = true if c.include? avd_name }
-  if match
-    telnet.close
-    return true
+  output_split = output.split("\n")
+  return [] unless output_split
+
+  devices = []
+  output_split.each do |device|
+    match = device.match(/^(?<emulator>emulator-\d*)/)
+    next if !match || !match.captures || match.captures.length != 1
+
+    devices << match.captures[0]
   end
-
-  telnet.puts('avd name')
-  telnet.waitfor('Match' => /OK/) { |c| match = true if c.include? avd_name }
-  if match
-    telnet.close
-    return true
-  end
-
-  telnet.puts('avd name')
-  telnet.waitfor('Match' => /OK/) { |c| match = true if c.include? avd_name }
-  telnet.close
-
-  return match
+  devices
 end
 
-def avd_image_serial(avd_name)
-  devices = %x(#{@adb} devices 2>&1)
-  puts "devices: #{devices}"
-  return nil unless devices
+def start_emulator(avd_name, timeout)
+  running_devices = emulator_list
 
-  devices = devices.split("\n")
-  return nil unless devices
-
-  devices.each do |device|
-    serial = device.match(/^emulator-(?<port>\d*)/)
-    next unless serial
-
-    port = serial.captures[0]
-    match = avd_name_match?(avd_name, port)
-    return serial if match
+  if running_devices.length > 0
+    puts 'Running emulators:'
+    running_devices.each do |device|
+      puts " * #{device}"
+    end
+  else
+    puts
+    puts '(i) No running emulator found'
   end
 
-  return nil
-end
 
-def start_emulator(avd_name, uuid)
   os = %x(uname -s 2>&1)
+  puts
   puts "os: #{os}"
 
   emulator = File.join(ENV['android_home'], 'tools/emulator')
+  emulator = File.join(ENV['android_home'], 'tools/emulator64-arm') if os.include? 'Linux'
 
-  cmd = "#{emulator} -avd #{avd_name} -no-boot-anim -no-skin -noaudio -no-window -prop emu.uuid=#{uuid}"
-  cmd += ' -force-32bit' if os.include? 'Linux'
+  params = [emulator, '-verbose', '-avd', avd_name]
+  params << '-netdelay none'
+  params << '-netspeed full'
 
-  puts "#{cmd}"
-  pid = spawn(cmd, [:out, :err] => ['emulator.log', 'w'])
-  Process.detach(pid)
-end
+  params << '-no-boot-anim' # Disable the boot animation during emulator startup.
+  params << '-noskin' # Don't use any emulator skin.
+  params << '-noaudio' # Disable audio support in the current emulator instance.
+  params << '-no-window' # Disable the emulator's graphical window display.
 
-def emulator_serial!(uuid)
-  Timeout.timeout(600) do
-    loop do
-      sleep 5
-      devices = %x(#{@adb} devices 2>&1).strip
-      puts
-      puts "devices_out: #{devices}"
-      next unless devices
+  command = params.join(' ')
 
-      devices = devices.split("\n")
-      next unless devices
+  puts "#{command}"
+  execute_with_timeout!(command, timeout)
 
-      devices.each do |device|
-        match = device.match(/^(?<emulator>emulator-\d*)/)
-        next unless match
+  devices = emulator_list
 
-        emu_udid_out = %x(#{@adb} -s #{match[0]} shell getprop emu.uuid 2>&1)
-        puts "emu_udid_out: #{emu_udid_out}"
-        return match[0] if emu_udid_out.strip.eql? uuid
-      end
+  puts
+  if devices.length > 0
+    puts 'Running emulators:'
+    devices.each do |device|
+      puts " * #{device}"
+    end
+  else
+    puts
+    puts '(i) No running emulator found'
+  end
+
+  started_emulator = ''
+  if running_devices.length == 0
+    started_emulator = devices[0] if devices.length == 1
+  else
+    if devices.length - running_devices.length != 1
+      raise "Running devices: #{running_devices.length} - after start #{devices.length}"
+    end
+
+    devices.each do |device|
+      next if running_devices.include? device
+
+      started_emulator = device
+      break
     end
   end
-  puts "Getting emulator's name timed out"
-  exit 1
+
+  started_emulator
 end
 
-def ensure_emulator_booted!(serial)
-  Timeout.timeout(600) do
+def execute_with_timeout!(command, timeout)
+  begin
+    pipe = IO.popen(command, 'r')
+  rescue Exception => e
+    raise "Execution of command #{command} unsuccessful, error: #{e}"
+  end
+
+  begin
+    Timeout::timeout(timeout) {
+      loop do
+        output = pipe.gets
+        if output.to_s != ''
+          puts "#{output}"
+
+          raise Timeout::Error.new if output.include? 'emulator: UpdateChecker'
+        end
+
+        sleep 5
+      end
+    }
+  rescue Timeout::Error
+    Process.detach(pipe.pid)
+    return
+  end
+end
+
+def ensure_emulator_booted!(serial, timeout)
+  device_started = false
+
+  Timeout.timeout(timeout) do
     loop do
       sleep 10
 
-      dev_boot_complete_out = `#{@adb} -s #{serial} shell "getprop dev.bootcomplete"`.strip
-      sys_boot_complete_out = `#{@adb} -s #{serial} shell "getprop sys.boot_completed"`.strip
-      boot_anim_out = `#{@adb} -s #{serial} shell "getprop init.svc.bootanim"`.strip
+      unless device_started
+        devices = %x(#{@adb} devices 2>&1).strip
+        next unless devices
+
+        devices = devices.split("\n")
+        next unless devices
+
+        devices.each do |device|
+          match = device.match("^#{serial}\\s(?<state>.*)")
+          next if !match || !match.captures || match.captures.length != 1
+
+          state = match.captures[0].strip
+
+          if state != 'device'
+            puts "#{serial} state: #{state}"
+            break
+          end
+
+          device_started = true
+          break
+        end
+
+        unless device_started
+          next
+        end
+      end
+
+      dev_boot = "#{@adb} -s #{serial} shell \"getprop dev.bootcomplete\""
+      dev_boot_complete_out = `#{dev_boot}`.strip
+
+      sys_boot = "#{@adb} -s #{serial} shell \"getprop sys.boot_completed\""
+      sys_boot_complete_out = `#{sys_boot}`.strip
+
+      boot_anim = "#{@adb} -s #{serial} shell \"getprop init.svc.bootanim\""
+      boot_anim_out = `#{boot_anim}`.strip
+
+      emulator_not_found = "error: device \'#{serial}\' not found"
+      if dev_boot_complete_out.include?(emulator_not_found) ||
+          sys_boot_complete_out.include?(emulator_not_found) ||
+          boot_anim_out.include?(emulator_not_found)
+
+      end
+
       puts "booted: #{dev_boot_complete_out} | booted: #{sys_boot_complete_out} | boot_anim: #{boot_anim_out}"
 
       return if dev_boot_complete_out.eql?('1') && sys_boot_complete_out.eql?('1') && boot_anim_out.eql?('stopped')
     end
   end
   puts 'Emulator timed out while booting'
-  exit 1
 end
 
 # -----------------------
-# --- main
+# --- Main
 # -----------------------
 
-emulator_uuid = SecureRandom.uuid
 emulator_name = ENV['emulator_name']
 
 avd_images = list_of_avd_images
@@ -153,35 +218,19 @@ if avd_images
 end
 
 puts
-puts '=> Restart adb'
-puts "#{@adb} kill-server"
-system("#{@adb} kill-server", out: $stdout, err: $stderr)
-
-puts "#{@adb} start-server"
-system("#{@adb} start-server", out: $stdout, err: $stderr)
-
+puts "=> Starting emulator (#{emulator_name}) ..."
+emulator_serial = start_emulator(emulator_name, 60)
+raise 'no serial' if emulator_serial.to_s == ''
 puts
-puts '=> Check if emulator already running'
-emulator_serial = avd_image_serial(emulator_name)
-unless emulator_serial
-  puts
-  puts '=> Emulator not running, starting it...'
-  start_emulator(emulator_name, emulator_uuid)
-
-  puts
-  puts '=> Get emulator serial'
-  emulator_serial = emulator_serial!(emulator_uuid)
-end
+puts "(i) emulator started with serial: #{emulator_serial}"
 
 puts
 puts '=> Ensure device is booted'
-ensure_emulator_booted!(emulator_serial)
+ensure_emulator_booted!(emulator_serial, 600)
 
 puts
 puts "(i) Emulator running wit serial: #{emulator_serial}"
-
 `#{@adb} -s #{emulator_serial} shell input keyevent 82 &`
-
 `envman add --key BITRISE_EMULATOR_SERIAL --value #{emulator_serial}`
 
 puts
