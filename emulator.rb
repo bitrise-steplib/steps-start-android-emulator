@@ -71,7 +71,7 @@ def start_emulator(avd_name, timeout)
   emulator = File.join(ENV['android_home'], 'tools/emulator')
   emulator = File.join(ENV['android_home'], 'tools/emulator64-arm') if os.include? 'Linux'
 
-  params = [emulator, '-verbose', '-avd', avd_name]
+  params = [emulator, '-avd', avd_name]
   params << '-netdelay none'
   params << '-netspeed full'
 
