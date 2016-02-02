@@ -71,7 +71,7 @@ def start_emulator(avd_name, timeout)
   emulator = File.join(ENV['android_home'], 'tools/emulator')
   emulator = File.join(ENV['android_home'], 'tools/emulator64-arm') if os.include? 'Linux'
 
-  params = [emulator, '-verbose', '-avd', avd_name]
+  params = [emulator, '-avd', avd_name]
   params << '-netdelay none'
   params << '-netspeed full'
 
@@ -219,7 +219,7 @@ end
 
 puts
 puts "=> Starting emulator (#{emulator_name}) ..."
-emulator_serial = start_emulator(emulator_name, 60)
+emulator_serial = start_emulator(emulator_name, 120)
 raise 'no serial' if emulator_serial.to_s == ''
 puts
 puts "(i) emulator started with serial: #{emulator_serial}"
