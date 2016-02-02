@@ -219,7 +219,7 @@ end
 
 puts
 puts "=> Starting emulator (#{emulator_name}) ..."
-emulator_serial = start_emulator(emulator_name, 60)
+emulator_serial = start_emulator(emulator_name, 120)
 raise 'no serial' if emulator_serial.to_s == ''
 puts
 puts "(i) emulator started with serial: #{emulator_serial}"
