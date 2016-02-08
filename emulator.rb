@@ -76,7 +76,8 @@ def start_emulator(avd_name, timeout)
   params << '-netspeed full'
 
   params << '-no-boot-anim' # Disable the boot animation during emulator startup.
-  params << '-noskin' # Don't use any emulator skin.
+  # Add nexus4-like skin to do UI testing
+  params << '-skin 768x1280'
   params << '-noaudio' # Disable audio support in the current emulator instance.
   params << '-no-window' # Disable the emulator's graphical window display.
 
@@ -231,6 +232,10 @@ ensure_emulator_booted!(emulator_serial, 600)
 puts
 puts "(i) Emulator running wit serial: #{emulator_serial}"
 `#{@adb} -s #{emulator_serial} shell input keyevent 82 &`
+`envman add --key BITRISE_EMULATOR_SERIAL --value #{emulator_serial}`
+
+# Remove the lockscreen that appears when the emulator is launched
+`#{@adb} -s #{emulator_serial} shell input keyevent 1`
 `envman add --key BITRISE_EMULATOR_SERIAL --value #{emulator_serial}`
 
 puts
