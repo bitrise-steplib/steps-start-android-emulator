@@ -15,22 +15,22 @@ is_requires_admin_user: false
 is_always_run: false
 is_skippable: false
 inputs:
-  - emulator_name:
+  - emulator_name: $BITRISE_EMULATOR_NAME
     opts:
-      title: "Emulator to boot"
+      title: Emulator to boot
       description: |
-        Emulator to boot
+        Emulator AVD image name to boot.
       is_required: true
   - skin:
     opts:
       title: Emulator skin
       description: |
         Use this input to specify an emulator skin.
-        Value example: 320x480
+        Value example: `320x480`.
   - android_home: $ANDROID_HOME
     opts:
-      title: "Android sdk path"
-      description: "Android sdk path"
+      title: Android sdk path
+      description: Android sdk path
       is_required: true
 outputs:
   - BITRISE_EMULATOR_SERIAL:

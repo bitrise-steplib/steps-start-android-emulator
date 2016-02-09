@@ -1,27 +1,23 @@
 format_version: 1.1.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
+app:
+  envs:
+  - BITRISE_EMULATOR_NAME: sys-img-armeabi-v7a-android-23
+
 workflows:
   test:
     steps:
-    - script:
-        title: Create AVD
-        inputs:
-        - content: |-
-            #!/bin/bash
-
-            echo "Create AVD"
-            emulator_name=sys-img-armeabi-v7a-android-23
-            echo no | android create avd --force -n $emulator_name -t android-23 --abi armeabi-v7a
-
-            envman add --key EMULATOR_NAME --value $emulator_name
+    # - create-android-emulator:
+    #     title: Create AVD
+    #     inputs:
+    #       - name: android-19-armeabi-v7a
+    #       - target: android-19
     - path::./:
         title: Step test
         is_always_run: true
         inputs:
-        - emulator_name: $EMULATOR_NAME
         - skin: "768x1280"
-        - android_home: $ANDROID_HOME
     - script:
         title: Output test
         is_always_run: true
@@ -35,9 +31,9 @@ workflows:
   share-this-step:
     envs:
       # if you want to share this step into a StepLib
-      - MY_STEPLIB_REPO_FORK_GIT_URL: $MY_STEPLIB_REPO_FORK_GIT_URL
+      - MY_STEPLIB_REPO_FORK_GIT_URL: git@github.com:godrei/bitrise-steplib.git
       - STEP_ID_IN_STEPLIB: start-android-emulator
-      - STEP_GIT_VERION_TAG_TO_SHARE: 0.9.8
+      - STEP_GIT_VERION_TAG_TO_SHARE: 1.0.0
       - STEP_GIT_CLONE_URL: https://github.com/bitrise-io/steps-start-android-emulator.git
     description: |-
       If this is the first time you try to share a Step you should
