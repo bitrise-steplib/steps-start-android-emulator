@@ -50,7 +50,7 @@ def emulator_list
   devices
 end
 
-def start_emulator(avd_name, timeout)
+def start_emulator(avd_name, skin, timeout)
   running_devices = emulator_list
 
   if running_devices.length > 0
@@ -72,13 +72,12 @@ def start_emulator(avd_name, timeout)
   emulator = File.join(ENV['android_home'], 'tools/emulator64-arm') if os.include? 'Linux'
 
   params = [emulator, '-avd', avd_name]
-  params << '-netdelay none'
-  params << '-netspeed full'
-
   params << '-no-boot-anim' # Disable the boot animation during emulator startup.
-  params << '-noskin' # Don't use any emulator skin.
   params << '-noaudio' # Disable audio support in the current emulator instance.
   params << '-no-window' # Disable the emulator's graphical window display.
+
+  params << "-skin #{skin}" unless skin.to_s == ''
+  params << '-noskin' if skin.to_s == ''
 
   command = params.join(' ')
 
@@ -186,13 +185,6 @@ def ensure_emulator_booted!(serial, timeout)
       boot_anim = "#{@adb} -s #{serial} shell \"getprop init.svc.bootanim\""
       boot_anim_out = `#{boot_anim}`.strip
 
-      emulator_not_found = "error: device \'#{serial}\' not found"
-      if dev_boot_complete_out.include?(emulator_not_found) ||
-          sys_boot_complete_out.include?(emulator_not_found) ||
-          boot_anim_out.include?(emulator_not_found)
-
-      end
-
       puts "booted: #{dev_boot_complete_out} | booted: #{sys_boot_complete_out} | boot_anim: #{boot_anim_out}"
 
       return if dev_boot_complete_out.eql?('1') && sys_boot_complete_out.eql?('1') && boot_anim_out.eql?('stopped')
@@ -206,6 +198,7 @@ end
 # -----------------------
 
 emulator_name = ENV['emulator_name']
+emulator_skin = ENV['emulator_skin']
 
 avd_images = list_of_avd_images
 if avd_images
@@ -219,7 +212,7 @@ end
 
 puts
 puts "=> Starting emulator (#{emulator_name}) ..."
-emulator_serial = start_emulator(emulator_name, 120)
+emulator_serial = start_emulator(emulator_name, emulator_skin, 120)
 raise 'no serial' if emulator_serial.to_s == ''
 puts
 puts "(i) emulator started with serial: #{emulator_serial}"
