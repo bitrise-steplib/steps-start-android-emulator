@@ -198,7 +198,7 @@ end
 # -----------------------
 
 emulator_name = ENV['emulator_name']
-emulator_skin = ENV['emulator_skin']
+emulator_skin = ENV['skin']
 
 avd_images = list_of_avd_images
 if avd_images

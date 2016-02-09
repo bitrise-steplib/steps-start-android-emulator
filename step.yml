@@ -21,12 +21,12 @@ inputs:
       description: |
         Emulator to boot
       is_required: true
-  - emulator_skin:
+  - skin:
     opts:
       title: Emulator skin
       description: |
         Use this input to specify an emulator skin.
-        Example: - emulator_skin: 320x480
+        Value example: 320x480
   - android_home: $ANDROID_HOME
     opts:
       title: "Android sdk path"
