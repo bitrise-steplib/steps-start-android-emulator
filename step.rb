@@ -145,7 +145,6 @@ begin
     os = `uname -s 2>&1`
 
     emulator = File.join(ENV['android_home'], 'tools/emulator')
-    emulator = File.join(ENV['android_home'], 'tools/emulator64-arm') if os.include? 'Linux'
 
     params = [emulator, '-avd', emulator_name]
     params << '-no-boot-anim' # Disable the boot animation during emulator startup.
