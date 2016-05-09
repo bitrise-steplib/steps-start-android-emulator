@@ -106,15 +106,15 @@ end
 #
 # Input validation
 emulator_name = ENV['emulator_name']
-if emulator_name.to_s == ''
-  log_fail('Missing required input: emulator_name')
-end
-
 emulator_skin = ENV['skin']
+emulator_options = ENV['other_options']
 
 log_info('Configs:')
 log_details("emulator_name: #{emulator_name}")
-log_details("skin: #{emulator_skin}") if emulator_skin.to_s != ''
+log_details("emulator_skin: #{emulator_skin}")
+log_details("emulator_options: #{emulator_options}")
+
+log_fail('Missing required input: emulator_name') if emulator_name.to_s == ''
 
 avd_images = list_of_avd_images
 if avd_images
@@ -127,7 +127,7 @@ end
 #
 # Print running devices
 running_devices = emulator_list
-if running_devices.length > 0
+unless running_devices.empty?
   log_info('Running emulators:')
   running_devices.each do |device, _|
     log_details("* #{device}")
@@ -155,12 +155,14 @@ begin
     params << "-skin #{emulator_skin}" unless emulator_skin.to_s == ''
     params << '-noskin' if emulator_skin.to_s == ''
 
+    params << emulator_options unless emulator_options.to_s == ''
+
     command = params.join(' ')
 
     log_info('Starting emulator')
     log_details(command)
 
-    t1 = Thread.new do
+    Thread.new do
       system(command)
     end
 
@@ -169,7 +171,7 @@ begin
     serial = nil
     looking_for_serial = true
 
-    while looking_for_serial do
+    while looking_for_serial
       sleep 5
 
       serial = find_started_serial(running_devices)
@@ -184,7 +186,7 @@ begin
 
     boot_in_progress = true
 
-    while boot_in_progress do
+    while boot_in_progress
       sleep 5
 
       dev_boot = "#{@adb} -s #{serial} shell \"getprop dev.bootcomplete\""

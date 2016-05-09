@@ -21,12 +21,20 @@ inputs:
       description: |
         Emulator AVD image name to boot.
       is_required: true
-  - skin:
+  - skin: "768x1280"
     opts:
       title: Emulator skin
       description: |
         Use this input to specify an emulator skin.
-        Value example: `320x480`.
+        Value example: `768x1280`.
+  - other_options: ""
+    opts:
+      title: Additional options for emulator call
+      description: |-
+        Options added to the end of the emulator call.
+
+        Example:
+        `-dpi-device 165 -no-cache`
   - android_home: $ANDROID_HOME
     opts:
       title: Android sdk path
