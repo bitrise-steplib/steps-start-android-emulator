@@ -149,7 +149,6 @@ begin
 
     params = [emulator, '-avd', emulator_name]
     params << '-no-boot-anim' # Disable the boot animation during emulator startup.
-    params << '-noaudio' # Disable audio support in the current emulator instance.
 
     params << "-skin #{emulator_skin}" unless emulator_skin.to_s == ''
     params << '-noskin' if emulator_skin.to_s == ''
