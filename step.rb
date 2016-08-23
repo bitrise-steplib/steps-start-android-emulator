@@ -123,11 +123,11 @@ unless other_options.to_s.empty?
   log_warn('other_options input is deprecated!')
   log_warn('Use emulator_options input to control all of emulator command\'s flags')
 
-  emulator_options = [
-    '-no-boot-anim', # Disable the boot animation during emulator startup.
-    '-no-window', # Disable the emulator's graphical window display.
-    other_options
-  ].join(' ')
+  options = []
+  options << emulator_options unless emulator_options.to_s.empty?
+  options << other_options unless other_options.to_s.empty?
+
+  emulator_options = options.join(' ')
 end
 
 avd_images = list_of_avd_images
