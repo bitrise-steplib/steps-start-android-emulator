@@ -27,19 +27,26 @@ inputs:
       description: |
         Use this input to specify an emulator skin.
         Value example: `768x1280`.
-  - other_options: ""
+  - emulator_options: "-no-boot-anim -no-audio -no-window"
     opts:
-      title: Additional options for emulator call
+      title: Specify emulator command's flags
       description: |-
-        Options added to the end of the emulator call.
-
-        Example:
-        `-dpi-device 165 -no-cache`
+        These flags will be added to the emulator command.
   - android_home: $ANDROID_HOME
     opts:
       title: Android sdk path
       description: Android sdk path
       is_required: true
+  - other_options: ""
+    opts:
+      title: "[Deprecated!] Additional options for emulator call"
+      description: |-
+        This options is deprecated please use `emulator_options` instead.
+        
+        Options added to the end of the emulator call.
+
+        Example:
+        `-dpi-device 165 -no-cache`
 outputs:
   - BITRISE_EMULATOR_SERIAL:
     opts:

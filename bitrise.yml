@@ -20,7 +20,6 @@ workflows:
         is_always_run: true
         inputs:
         - skin: "768x1280"
-        - other_options: -dpi-device 165
     - script:
         title: Output test
         is_always_run: true

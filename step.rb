@@ -26,7 +26,7 @@ def log_info(message)
 end
 
 def log_details(message)
-  puts "  \e[97m#{message}\e[0m"
+  puts "  #{message}"
 end
 
 def log_done(message)
@@ -107,14 +107,28 @@ end
 # Input validation
 emulator_name = ENV['emulator_name']
 emulator_skin = ENV['skin']
-emulator_options = ENV['other_options']
+emulator_options = ENV['emulator_options']
+other_options = ENV['other_options']
 
 log_info('Configs:')
 log_details("emulator_name: #{emulator_name}")
 log_details("emulator_skin: #{emulator_skin}")
 log_details("emulator_options: #{emulator_options}")
+log_details("[deprecated!] other_options: #{other_options}")
 
 log_fail('Missing required input: emulator_name') if emulator_name.to_s == ''
+
+unless other_options.to_s.empty?
+  puts
+  log_warn('other_options input is deprecated!')
+  log_warn('Use emulator_options input to control all of emulator command\'s flags')
+
+  options = []
+  options << emulator_options unless emulator_options.to_s.empty?
+  options << other_options unless other_options.to_s.empty?
+
+  emulator_options = options.join(' ')
+end
 
 avd_images = list_of_avd_images
 if avd_images
@@ -148,14 +162,10 @@ begin
     emulator = File.join(ENV['android_home'], 'tools/emulator64-arm') if os.include? 'Linux'
 
     params = [emulator, '-avd', emulator_name]
-    params << '-no-boot-anim' # Disable the boot animation during emulator startup.
-    params << '-noaudio' # Disable audio support in the current emulator instance.
-    params << '-no-window' # Disable the emulator's graphical window display.
+    params << "-skin #{emulator_skin}" unless emulator_skin.to_s.empty?
+    params << '-noskin' if emulator_skin.to_s.empty?
 
-    params << "-skin #{emulator_skin}" unless emulator_skin.to_s == ''
-    params << '-noskin' if emulator_skin.to_s == ''
-
-    params << emulator_options unless emulator_options.to_s == ''
+    params << emulator_options unless emulator_options.to_s.empty?
 
     command = params.join(' ')
 
