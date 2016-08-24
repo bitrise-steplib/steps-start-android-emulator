@@ -1,6 +1,13 @@
-## Changelog (Current version: 1.0.2)
+## Changelog (Current version: 1.1.0)
 
 -----------------
+
+### 1.1.0 (2016 Aug 24)
+
+* [b0f58b3] prepare for 1.1.0
+* [cc33849] Merge pull request #24 from bitrise-steplib/emulator-options
+* [3288420] merge other_options and emulator_options
+* [4c42f66] emulator options
 
 ### 1.0.2 (2016 May 09)
 
@@ -81,4 +88,4 @@
 
 -----------------
 
-Updated: 2016 May 09
+Updated: 2016 Aug 24
