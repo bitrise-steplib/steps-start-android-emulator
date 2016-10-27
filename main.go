@@ -259,7 +259,7 @@ func main() {
 			line := errScanner.Text()
 			log.Warn(line)
 
-			e <- errors.New(line)
+			// e <- errors.New(line)
 		}
 	}()
 	if err := errScanner.Err(); err != nil {
