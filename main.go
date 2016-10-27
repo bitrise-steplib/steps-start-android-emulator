@@ -257,6 +257,11 @@ func main() {
 	go func() {
 		for errScanner.Scan() {
 			line := errScanner.Text()
+			fmt.Println(line)
+
+			if strings.Contains(line, "resize2fs") {
+				continue
+			}
 
 			e <- errors.New(line)
 		}
