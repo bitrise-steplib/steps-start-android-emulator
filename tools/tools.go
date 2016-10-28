@@ -6,6 +6,7 @@ import (
 	"runtime"
 
 	"github.com/bitrise-io/go-utils/cmdex"
+	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 )
 
@@ -35,22 +36,37 @@ func (adb ADBModel) DevicesCmd() *cmdex.CommandModel {
 // IsDeviceBooted ...
 func (adb ADBModel) IsDeviceBooted(serial string) (bool, error) {
 	devBootCmd := cmdex.NewCommand(adb.pth, "-s", serial, "shell", "getprop dev.bootcomplete")
+
+	log.Detail("$ %s", cmdex.PrintableCommandArgs(false, devBootCmd.GetCmd().Args))
+
 	devBootOut, err := devBootCmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return false, err
 	}
 
+	log.Detail(devBootOut)
+
 	sysBootCmd := cmdex.NewCommand(adb.pth, "-s", serial, "shell", "getprop sys.boot_completed")
+
+	log.Detail("$ %s", cmdex.PrintableCommandArgs(false, sysBootCmd.GetCmd().Args))
+
 	sysBootOut, err := sysBootCmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return false, err
 	}
 
+	log.Detail(sysBootOut)
+
 	bootAnimCmd := cmdex.NewCommand(adb.pth, "-s", serial, "shell", "getprop init.svc.bootanim")
+
+	log.Detail("$ %s", cmdex.PrintableCommandArgs(false, bootAnimCmd.GetCmd().Args))
+
 	bootAnimOut, err := bootAnimCmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return false, err
 	}
+
+	log.Detail(bootAnimOut)
 
 	return (devBootOut == "1" && sysBootOut == "1" && bootAnimOut == "stopped"), nil
 }
@@ -89,7 +105,7 @@ func NewEmulator(androidHomeDir string) (*EmulatorModel, error) {
 
 // StartEmulatorCmd ...
 func (emulator EmulatorModel) StartEmulatorCmd(name, skin string, options ...string) *cmdex.CommandModel {
-	args := []string{emulator.pth, "-avd", name}
+	args := []string{emulator.pth, "-verbose", "-avd", name}
 	if len(skin) == 0 {
 		args = append(args, "-noskin")
 	} else {

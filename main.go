@@ -104,10 +104,14 @@ func currentlyStartedDeviceSerial(alreadyRunningDeviceInfos, currentlyRunningDev
 func runningDeviceInfos(adb tools.ADBModel) (map[string]string, error) {
 	cmd := adb.DevicesCmd()
 
+	log.Detail("$ %s", cmdex.PrintableCommandArgs(false, cmd.GetCmd().Args))
+
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return map[string]string{}, fmt.Errorf("command failed, error: %s", err)
 	}
+
+	log.Detail(out)
 
 	// List of devices attached
 	// emulator-5554	device
@@ -164,7 +168,7 @@ func main() {
 	}
 
 	if !sliceutil.IsStringInSlice(configs.EmulatorName, avdImages) {
-		log.Warn("avd image not exists with name: %s", configs.EmulatorName)
+		log.Error("AVD image not exists with name: %s", configs.EmulatorName)
 
 		if len(avdImages) > 0 {
 			log.Detail("Available avd images:")
@@ -172,6 +176,8 @@ func main() {
 				log.Detail("* %s", avdImage)
 			}
 		}
+
+		os.Exit(1)
 	}
 
 	log.Done("AVD image (%s) exist", configs.EmulatorName)
@@ -276,7 +282,7 @@ func main() {
 		fmt.Println()
 
 		if err := startEmulatorCommand.Run(); err != nil {
-			log.Error(err.Error())
+			log.Error("Start failed: %s", err.Error())
 			e <- err
 			return
 		}

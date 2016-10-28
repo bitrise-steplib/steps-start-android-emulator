@@ -12,19 +12,39 @@ workflows:
   # ----------------------------------------------------------------
   # --- workflow to Step Test
   test:
-    before_run:
-    - go-tests
+    # before_run:
+    # - go-tests
     steps:
-    # - create-android-emulator:
-    #     title: Create AVD
-    #     inputs:
-    #       - name: android-19-armeabi-v7a
-    #       - target: android-19
+    - create-android-emulator:
+        run_if: .IsCI
+        title: Create AVD
+        inputs:
+          - name: test
+          - platform: android-23
+    - script:
+        run_if: .IsCI
+        inputs:
+        - content: |-
+            set -ex
+            # sudo apt-get update
+            # echo yes | sudo apt-get install -y libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1
+            # echo yes | sudo apt-get install program:i386
+
+            # sudo dpkg --add-architecture i386
+            # sudo apt-get update
+            # echo yes | sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
+            # echo yes | sudo apt-get install xorg-dev
+            # echo yes | sudo apt-get install libsdl1.2debian:i386
+            # echo yes | apt-get install strace
+
+            ls $ANDROID_HOME/tools/lib64/
+            cp $ANDROID_HOME/tools/lib64/lib64OpenglRender.so $ANDROID_HOME/tools/lib64/lib64OpenglRender.so.bak
+            envman add --key LD_LIBRARY_PATH --value "$ANDROID_HOME/tools/lib64"
     - path::./:
         title: Step test
-        is_always_run: true
         inputs:
-        - skin: "768x1280"
+        - skin: ""
+        - emulator_options: "-no-window -gpu on"
     - script:
         title: Output test
         is_always_run: true
