@@ -5,61 +5,106 @@ app:
   envs:
   - RELEASE_VERSION: 1.1.0
 
-  - BITRISE_EMULATOR_NAME: Nexus_5_API_23
-#   - BITRISE_EMULATOR_NAME: API_23_x86
+  - EMULATOR_NAME: Nexus_5_API_23
+  - EMULATOR_SKIN: 768x1280
+  - EMULATOR_OPTIONS: "-gpu on"
 
 workflows:
   # ----------------------------------------------------------------
   # --- workflow to Step Test
   test:
-    # before_run:
-    # - go-tests
+    before_run:
+    - go-tests
     steps:
-    - create-android-emulator:
-        run_if: .IsCI
-        title: Create AVD
+    - change-workdir:
+        title: Change workdir
         inputs:
-          - name: test
-          - platform: android-23
-    - script:
-        run_if: .IsCI
-        inputs:
-        - content: |-
-            # set -ex
-            # sudo apt-get update
-            # echo yes | sudo apt-get install -y libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1
-            # echo yes | sudo apt-get install program:i386
-
-            # sudo dpkg --add-architecture i386
-            # sudo apt-get update
-            # echo yes | sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386
-            # echo yes | sudo apt-get install xorg-dev
-            # echo yes | sudo apt-get install libsdl1.2debian:i386
-            # echo yes | apt-get install strace
-
-            # ls $ANDROID_HOME/tools/lib64/
-            # cp $ANDROID_HOME/tools/lib64/lib64OpenglRender.so $ANDROID_HOME/tools/lib64/lib64OpenglRender.so.bak
-            envman add --key LD_LIBRARY_PATH --value "$ANDROID_HOME/tools/lib64"
-
-            echo
-            echo " hardware virtualization: $(egrep -c '(vmx|svm)' /proc/cpuinfo)"
-
-            echo
-            echo "enabled in BIOS: $(cat /sys/hypervisor/properties/capabilities)"
-
-            echo
-            echo "kvm: $(kvm-ok)"
+        - path: ./_tmp
     - path::./:
         title: Step test
         inputs:
-        - skin: ""
-        - emulator_options: "-no-window -gpu on"
+        - emulator_name: $EMULATOR_NAME
+        - skin: $EMULATOR_SKIN
+        - emulator_options: $EMULATOR_OPTIONS
     - script:
         title: Output test
         is_always_run: true
         inputs:
         - content: |
-            echo "BITRISE_EMULATOR_SERIAL: ${BITRISE_EMULATOR_SERIAL}"
+            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
+
+  ci:
+    before_run:
+    - go-tests
+    steps:
+    - change-workdir:
+        title: Change workdir
+        inputs:
+        - path: ./_tmp
+    # ---
+    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@x86:
+        title: Create android-23-armeabi-v7a
+        inputs:
+        - name: android-23-armeabi-v7a
+        - platform: android-23
+        - abi: armeabi-v7a
+    - path::./:
+        title: Step test
+        inputs:
+        - emulator_name: $BITRISE_EMULATOR_NAME
+    - script:
+        title: Output test
+        is_always_run: true
+        inputs:
+        - content: |
+            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
+    - script:
+        title: Stop Android Emulator
+        inputs:
+        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
+    # ---
+    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@x86:
+        title: Create android-21-armeabi-v7a
+        inputs:
+        - name: android-21-armeabi-v7a
+        - platform: android-21
+        - abi: armeabi-v7a
+    - path::./:
+        title: Step test
+        inputs:
+        - emulator_name: $BITRISE_EMULATOR_NAME
+    - script:
+        title: Output test
+        is_always_run: true
+        inputs:
+        - content: |
+            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
+    - script:
+        title: Stop Android Emulator
+        inputs:
+        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
+    # ---
+    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@x86:
+        title: Create android-23-x86
+        inputs:
+        - name: android-23-x86
+        - platform: android-23
+        - abi: x86
+    - path::./:
+        title: Step test
+        inputs:
+        - emulator_name: $BITRISE_EMULATOR_NAME
+    - script:
+        title: Output test
+        is_always_run: true
+        inputs:
+        - content: |
+            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
+    - script:
+        title: Stop Android Emulator
+        inputs:
+        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
+    # ---
 
   go-tests:
     before_run:
