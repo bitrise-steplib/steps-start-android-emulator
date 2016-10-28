@@ -15,7 +15,7 @@ workflows:
     # before_run:
     # - go-tests
     steps:
-    - create-android-emulator:
+    - path::./steps-create-android-emulator/:
         run_if: .IsCI
         title: Create AVD
         inputs:
@@ -25,7 +25,7 @@ workflows:
         run_if: .IsCI
         inputs:
         - content: |-
-            set -ex
+            # set -ex
             # sudo apt-get update
             # echo yes | sudo apt-get install -y libc6-i386 lib32stdc++6 lib32gcc1 lib32ncurses5 lib32z1
             # echo yes | sudo apt-get install program:i386
@@ -37,9 +37,18 @@ workflows:
             # echo yes | sudo apt-get install libsdl1.2debian:i386
             # echo yes | apt-get install strace
 
-            ls $ANDROID_HOME/tools/lib64/
-            cp $ANDROID_HOME/tools/lib64/lib64OpenglRender.so $ANDROID_HOME/tools/lib64/lib64OpenglRender.so.bak
+            # ls $ANDROID_HOME/tools/lib64/
+            # cp $ANDROID_HOME/tools/lib64/lib64OpenglRender.so $ANDROID_HOME/tools/lib64/lib64OpenglRender.so.bak
             envman add --key LD_LIBRARY_PATH --value "$ANDROID_HOME/tools/lib64"
+
+            echo
+            echo " hardware virtualization: $(egrep -c '(vmx|svm)' /proc/cpuinfo)"
+
+            echo
+            echo "enabled in BIOS: $(cat /sys/hypervisor/properties/capabilities)"
+
+            echo
+            echo "kvm: $(kvm-ok)"
     - path::./:
         title: Step test
         inputs:
