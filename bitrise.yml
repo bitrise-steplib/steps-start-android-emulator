@@ -42,12 +42,11 @@ workflows:
         inputs:
         - path: ./_tmp
     # ---
-    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@x86:
+    - create-android-emulator:
         title: Create android-23-armeabi-v7a
         inputs:
         - name: android-23-armeabi-v7a
         - platform: android-23
-        - abi: armeabi-v7a
     - path::./:
         title: Step test
         inputs:
@@ -63,12 +62,32 @@ workflows:
         inputs:
         - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
     # ---
-    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@x86:
+    - create-android-emulator:
+        title: Create android-23-armeabi-v7a
+        inputs:
+        - name: android-23-armeabi-v7a
+        - platform: android-23
+    - path::./:
+        title: Step test
+        inputs:
+        - emulator_name: $BITRISE_EMULATOR_NAME
+        - emulator_options: "-gpu on"
+    - script:
+        title: Output test
+        is_always_run: true
+        inputs:
+        - content: |
+            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
+    - script:
+        title: Stop Android Emulator
+        inputs:
+        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
+    # ---
+    - create-android-emulator:
         title: Create android-21-armeabi-v7a
         inputs:
         - name: android-21-armeabi-v7a
         - platform: android-21
-        - abi: armeabi-v7a
     - path::./:
         title: Step test
         inputs:
@@ -83,28 +102,6 @@ workflows:
         title: Stop Android Emulator
         inputs:
         - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
-    # ---
-    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@x86:
-        title: Create android-23-x86
-        inputs:
-        - name: android-23-x86
-        - platform: android-23
-        - abi: x86
-    - path::./:
-        title: Step test
-        inputs:
-        - emulator_name: $BITRISE_EMULATOR_NAME
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |
-            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
-    - script:
-        title: Stop Android Emulator
-        inputs:
-        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
-    # ---
 
   go-tests:
     before_run:

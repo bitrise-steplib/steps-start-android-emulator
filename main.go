@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/bitrise-io/go-utils/cmdex"
-	"github.com/bitrise-io/go-utils/fileutil"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
@@ -109,15 +108,10 @@ func currentlyStartedDeviceSerial(alreadyRunningDeviceInfos, currentlyRunningDev
 
 func runningDeviceInfos(adb tools.ADBModel) (map[string]string, error) {
 	cmd := adb.DevicesCmd()
-
-	log.Detail("$ %s", cmdex.PrintableCommandArgs(false, cmd.GetCmd().Args))
-
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return map[string]string{}, fmt.Errorf("command failed, error: %s", err)
 	}
-
-	log.Detail(out)
 
 	// List of devices attached
 	// emulator-5554	device
@@ -187,27 +181,6 @@ func main() {
 	}
 
 	log.Done("AVD image (%s) exist", configs.EmulatorName)
-
-	avdImageDir := avdImageDir(configs.EmulatorName)
-	configIniPth := filepath.Join(avdImageDir, "config.ini")
-
-	log.Detail("Checking emulator configs at: %s", configIniPth)
-
-	if exist, err := pathutil.IsPathExists(configIniPth); err != nil {
-		log.Error("Failed to check if path exist, error: %s", err)
-		os.Exit(1)
-	} else if !exist {
-		log.Error("Config.ini not exists at: %s", configIniPth)
-		os.Exit(1)
-	} else {
-		content, err := fileutil.ReadStringFromFile(configIniPth)
-		if err != nil {
-			log.Error("Failed to read config.ini, error: %s", err)
-			os.Exit(1)
-		}
-
-		fmt.Printf("config-ini:\n%s\n", content)
-	}
 	// ---
 
 	adb, err := tools.NewADB(configs.AndroidHome)
@@ -309,7 +282,6 @@ func main() {
 		fmt.Println()
 
 		if err := startEmulatorCommand.Run(); err != nil {
-			log.Error("Start failed: %s", err.Error())
 			e <- err
 			return
 		}
