@@ -5,7 +5,7 @@ app:
   envs:
   - RELEASE_VERSION: 1.1.0
 
-  - BITRISE_EMULATOR_NAME: API_23_armeabi_v7a
+  - BITRISE_EMULATOR_NAME: Nexus_5_API_23
 #   - BITRISE_EMULATOR_NAME: API_23_x86
 
 workflows:
@@ -15,7 +15,7 @@ workflows:
     # before_run:
     # - go-tests
     steps:
-    - path::./steps-create-android-emulator/:
+    - create-android-emulator:
         run_if: .IsCI
         title: Create AVD
         inputs:
