@@ -109,6 +109,7 @@ emulator_name = ENV['emulator_name']
 emulator_skin = ENV['skin']
 emulator_options = ENV['emulator_options']
 other_options = ENV['other_options']
+wait_for_boot = ENV['wait_for_boot']
 
 log_info('Configs:')
 log_details("emulator_name: #{emulator_name}")
@@ -192,6 +193,8 @@ begin
 
     #
     # Wait for boot finish
+    if wait_for_boot != "false"
+
     log_info('Waiting for emulator boot')
 
     boot_in_progress = true
@@ -217,6 +220,7 @@ begin
     `envman add --key BITRISE_EMULATOR_SERIAL --value #{serial}`
 
     log_done('Emulator is ready to use 🚀')
+    end
     exit(0)
   end
 rescue Timeout::Error

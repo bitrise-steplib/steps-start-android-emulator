@@ -11,11 +11,12 @@ workflows:
   # --- workflow to Step Test
   test:
     steps:
-    # - create-android-emulator:
-    #     title: Create AVD
-    #     inputs:
-    #       - name: android-19-armeabi-v7a
-    #       - target: android-19
+    - create-android-emulator:
+         title: Create AVD
+         inputs:
+           - name: android-19-armeabi-v7a
+           - target: android-19
+         run_if: .IsCI
     - path::./:
         title: Step test
         is_always_run: true
