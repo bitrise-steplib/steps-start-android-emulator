@@ -42,6 +42,9 @@ inputs:
       title: Wait for emulator boot
       description: If this option is false, the step will not wait for the emulator to finish boot
       is_required: true
+      value_options:
+      - "true"
+      - "false"
   - other_options: ""
     opts:
       title: "[Deprecated!] Additional options for emulator call"

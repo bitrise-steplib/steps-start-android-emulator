@@ -195,32 +195,33 @@ begin
     # Wait for boot finish
     if wait_for_boot != "false"
 
-    log_info('Waiting for emulator boot')
+      log_info('Waiting for emulator boot')
 
-    boot_in_progress = true
+      boot_in_progress = true
 
-    while boot_in_progress
-      sleep 5
+      while boot_in_progress
+        sleep 5
 
-      dev_boot = "#{@adb} -s #{serial} shell \"getprop dev.bootcomplete\""
-      dev_boot_complete_out = `#{dev_boot}`.strip
+        dev_boot = "#{@adb} -s #{serial} shell \"getprop dev.bootcomplete\""
+        dev_boot_complete_out = `#{dev_boot}`.strip
 
-      sys_boot = "#{@adb} -s #{serial} shell \"getprop sys.boot_completed\""
-      sys_boot_complete_out = `#{sys_boot}`.strip
+        sys_boot = "#{@adb} -s #{serial} shell \"getprop sys.boot_completed\""
+        sys_boot_complete_out = `#{sys_boot}`.strip
 
-      boot_anim = "#{@adb} -s #{serial} shell \"getprop init.svc.bootanim\""
-      boot_anim_out = `#{boot_anim}`.strip
+        boot_anim = "#{@adb} -s #{serial} shell \"getprop init.svc.bootanim\""
+        boot_anim_out = `#{boot_anim}`.strip
 
-      boot_in_progress = false if dev_boot_complete_out.eql?('1') && sys_boot_complete_out.eql?('1') && boot_anim_out.eql?('stopped')
+        boot_in_progress = false if dev_boot_complete_out.eql?('1') && sys_boot_complete_out.eql?('1') && boot_anim_out.eql?('stopped')
+      end
+
+      `#{@adb} -s #{serial} shell input keyevent 82 &`
+      `#{@adb} -s #{serial} shell input keyevent 1 &`
+
+      log_done('Emulator is ready to use 🚀')
     end
-
-    `#{@adb} -s #{serial} shell input keyevent 82 &`
-    `#{@adb} -s #{serial} shell input keyevent 1 &`
 
     `envman add --key BITRISE_EMULATOR_SERIAL --value #{serial}`
 
-    log_done('Emulator is ready to use 🚀')
-    end
     exit(0)
   end
 rescue Timeout::Error
