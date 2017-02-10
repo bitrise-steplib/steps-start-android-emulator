@@ -115,6 +115,7 @@ log_info('Configs:')
 log_details("emulator_name: #{emulator_name}")
 log_details("emulator_skin: #{emulator_skin}")
 log_details("emulator_options: #{emulator_options}")
+log_details("wait_for_boot: #{wait_for_boot}")
 log_details("[deprecated!] other_options: #{other_options}")
 
 log_fail('Missing required input: emulator_name') if emulator_name.to_s == ''
