@@ -109,11 +109,13 @@ emulator_name = ENV['emulator_name']
 emulator_skin = ENV['skin']
 emulator_options = ENV['emulator_options']
 other_options = ENV['other_options']
+wait_for_boot = ENV['wait_for_boot']
 
 log_info('Configs:')
 log_details("emulator_name: #{emulator_name}")
 log_details("emulator_skin: #{emulator_skin}")
 log_details("emulator_options: #{emulator_options}")
+log_details("wait_for_boot: #{wait_for_boot}")
 log_details("[deprecated!] other_options: #{other_options}")
 
 log_fail('Missing required input: emulator_name') if emulator_name.to_s == ''
@@ -192,31 +194,35 @@ begin
 
     #
     # Wait for boot finish
-    log_info('Waiting for emulator boot')
+    if wait_for_boot != "false"
 
-    boot_in_progress = true
+      log_info('Waiting for emulator boot')
 
-    while boot_in_progress
-      sleep 5
+      boot_in_progress = true
 
-      dev_boot = "#{@adb} -s #{serial} shell \"getprop dev.bootcomplete\""
-      dev_boot_complete_out = `#{dev_boot}`.strip
+      while boot_in_progress
+        sleep 5
 
-      sys_boot = "#{@adb} -s #{serial} shell \"getprop sys.boot_completed\""
-      sys_boot_complete_out = `#{sys_boot}`.strip
+        dev_boot = "#{@adb} -s #{serial} shell \"getprop dev.bootcomplete\""
+        dev_boot_complete_out = `#{dev_boot}`.strip
 
-      boot_anim = "#{@adb} -s #{serial} shell \"getprop init.svc.bootanim\""
-      boot_anim_out = `#{boot_anim}`.strip
+        sys_boot = "#{@adb} -s #{serial} shell \"getprop sys.boot_completed\""
+        sys_boot_complete_out = `#{sys_boot}`.strip
 
-      boot_in_progress = false if dev_boot_complete_out.eql?('1') && sys_boot_complete_out.eql?('1') && boot_anim_out.eql?('stopped')
+        boot_anim = "#{@adb} -s #{serial} shell \"getprop init.svc.bootanim\""
+        boot_anim_out = `#{boot_anim}`.strip
+
+        boot_in_progress = false if dev_boot_complete_out.eql?('1') && sys_boot_complete_out.eql?('1') && boot_anim_out.eql?('stopped')
+      end
+
+      `#{@adb} -s #{serial} shell input keyevent 82 &`
+      `#{@adb} -s #{serial} shell input keyevent 1 &`
+
+      log_done('Emulator is ready to use 🚀')
     end
-
-    `#{@adb} -s #{serial} shell input keyevent 82 &`
-    `#{@adb} -s #{serial} shell input keyevent 1 &`
 
     `envman add --key BITRISE_EMULATOR_SERIAL --value #{serial}`
 
-    log_done('Emulator is ready to use 🚀')
     exit(0)
   end
 rescue Timeout::Error
