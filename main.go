@@ -320,6 +320,9 @@ func main() {
 
 				bootInProgress = !booted
 			}
+
+			adb.UnlockDevice(serial)
+
 			log.Donef("> Device booted")
 		}
 		e <- nil
