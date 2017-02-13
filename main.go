@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bitrise-io/go-utils/cmdex"
+	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
@@ -36,11 +36,11 @@ func createConfigsModelFromEnvs() ConfigsModel {
 }
 
 func (configs ConfigsModel) print() {
-	log.Info("Configs:")
-	log.Detail("- EmulatorName: %s", configs.EmulatorName)
-	log.Detail("- Skin: %s", configs.Skin)
-	log.Detail("- EmulatorOptions: %s", configs.EmulatorOptions)
-	log.Detail("- AndroidHome: %s", configs.AndroidHome)
+	log.Infof("Configs:")
+	log.Printf("- EmulatorName: %s", configs.EmulatorName)
+	log.Printf("- Skin: %s", configs.Skin)
+	log.Printf("- EmulatorOptions: %s", configs.EmulatorOptions)
+	log.Printf("- AndroidHome: %s", configs.AndroidHome)
 }
 
 func (configs ConfigsModel) validate() error {
@@ -140,9 +140,14 @@ func runningDeviceInfos(adb tools.ADBModel) (map[string]string, error) {
 }
 
 func exportEnvironmentWithEnvman(keyStr, valueStr string) error {
-	cmd := cmdex.NewCommand("envman", "add", "--key", keyStr)
+	cmd := command.New("envman", "add", "--key", keyStr)
 	cmd.SetStdin(strings.NewReader(valueStr))
 	return cmd.Run()
+}
+
+func failf(format string, v ...interface{}) {
+	log.Errorf(format, v...)
+	os.Exit(1)
 }
 
 func main() {
@@ -152,78 +157,72 @@ func main() {
 	configs.print()
 
 	if err := configs.validate(); err != nil {
-		log.Error("Issue with input: %s", err)
-		os.Exit(1)
+		failf("Issue with input: %s", err)
 	}
 
 	//
 	// Validate AVD image
 	fmt.Println()
-	log.Info("Validate AVD image")
+	log.Infof("Validate AVD image")
 
 	avdImages, err := listAVDImages()
 	if err != nil {
-		log.Error("Failed to list AVD images, error: %s", err)
-		os.Exit(1)
+		failf("Failed to list AVD images, error: %s", err)
 	}
 
 	if !sliceutil.IsStringInSlice(configs.EmulatorName, avdImages) {
-		log.Error("AVD image not exists with name: %s", configs.EmulatorName)
+		log.Errorf("AVD image not exists with name: %s", configs.EmulatorName)
 
 		if len(avdImages) > 0 {
-			log.Detail("Available avd images:")
+			log.Printf("Available avd images:")
 			for _, avdImage := range avdImages {
-				log.Detail("* %s", avdImage)
+				log.Printf("* %s", avdImage)
 			}
 		}
 
 		os.Exit(1)
 	}
 
-	log.Done("AVD image (%s) exist", configs.EmulatorName)
+	log.Donef("AVD image (%s) exist", configs.EmulatorName)
 	// ---
 
 	adb, err := tools.NewADB(configs.AndroidHome)
 	if err != nil {
-		log.Error("Failed to create adb model, error: %s", err)
-		os.Exit(1)
+		failf("Failed to create adb model, error: %s", err)
 	}
 
 	//
 	// Print running devices Info
 	deviceStateMap, err := runningDeviceInfos(*adb)
 	if err != nil {
-		log.Error("Failed to list running device infos, error: %s", err)
-		os.Exit(1)
+		failf("Failed to list running device infos, error: %s", err)
 	}
 
 	if len(deviceStateMap) > 0 {
 		fmt.Println()
-		log.Info("Running devices:")
+		log.Infof("Running devices:")
 
 		for serial, state := range deviceStateMap {
-			log.Detail("* %s (%s)", serial, state)
+			log.Printf("* %s (%s)", serial, state)
 		}
 	}
 	// ---
 
 	emulator, err := tools.NewEmulator(configs.AndroidHome)
 	if err != nil {
-		log.Error("Failed to create emulator model, error: %s", err)
-		os.Exit(1)
+		failf("Failed to create emulator model, error: %s", err)
 	}
 
 	//
 	// Start AVD image
 	fmt.Println()
-	log.Info("Start AVD image")
+	log.Infof("Start AVD image")
 
 	options := []string{}
 	if len(configs.EmulatorOptions) > 0 {
 		split, err := shellquote.Split(configs.EmulatorOptions)
 		if err != nil {
-			log.Error("Failed to split emulatoro ptions (%s), error: %s", configs.EmulatorOptions, err)
-			os.Exit(1)
+			failf("Failed to split emulatoro ptions (%s), error: %s", configs.EmulatorOptions, err)
 		}
 		options = split
 	}
@@ -236,8 +235,7 @@ func main() {
 	// Redirect output
 	stdoutReader, err := startEmulatorCmd.StdoutPipe()
 	if err != nil {
-		log.Error("Failed to redirect output, error: %s", err)
-		os.Exit(1)
+		failf("Failed to redirect output, error: %s", err)
 	}
 
 	outScanner := bufio.NewScanner(stdoutReader)
@@ -248,29 +246,24 @@ func main() {
 		}
 	}()
 	if err := outScanner.Err(); err != nil {
-		log.Error("Scanner failed, error: %s", err)
-		os.Exit(1)
+		failf("Scanner failed, error: %s", err)
 	}
 
 	// Redirect error
 	stderrReader, err := startEmulatorCmd.StderrPipe()
 	if err != nil {
-		log.Error("Failed to redirect error, error: %s", err)
-		os.Exit(1)
+		failf("Failed to redirect error, error: %s", err)
 	}
 
 	errScanner := bufio.NewScanner(stderrReader)
 	go func() {
 		for errScanner.Scan() {
 			line := errScanner.Text()
-			log.Warn(line)
-
-			// e <- errors.New(line)
+			log.Warnf(line)
 		}
 	}()
 	if err := errScanner.Err(); err != nil {
-		log.Error("Scanner failed, error: %s", err)
-		os.Exit(1)
+		failf("Scanner failed, error: %s", err)
 	}
 	// ---
 
@@ -278,7 +271,7 @@ func main() {
 
 	go func() {
 		// Start emulator
-		log.Detail("$ %s", cmdex.PrintableCommandArgs(false, startEmulatorCmd.Args))
+		log.Printf("$ %s", command.PrintableCommandArgs(false, startEmulatorCmd.Args))
 		fmt.Println()
 
 		if err := startEmulatorCommand.Run(); err != nil {
@@ -292,7 +285,7 @@ func main() {
 		for len(serial) == 0 {
 			time.Sleep(5 * time.Second)
 
-			log.Detail("> Checking for started device serial...")
+			log.Printf("> Checking for started device serial...")
 
 			currentDeviceStateMap, err := runningDeviceInfos(*adb)
 			if err != nil {
@@ -303,14 +296,14 @@ func main() {
 			serial = currentlyStartedDeviceSerial(deviceStateMap, currentDeviceStateMap)
 		}
 
-		log.Done("> Started device serial: %s", serial)
+		log.Donef("> Started device serial: %s", serial)
 
 		// Wait until device is booted
 		bootInProgress := true
 		for bootInProgress {
 			time.Sleep(5 * time.Second)
 
-			log.Detail("> Checking if device booted...")
+			log.Printf("> Checking if device booted...")
 
 			booted, err := adb.IsDeviceBooted(serial)
 			if err != nil {
@@ -321,33 +314,30 @@ func main() {
 			bootInProgress = !booted
 		}
 
-		log.Done("> Device booted")
+		log.Donef("> Device booted")
 
 		e <- nil
 	}()
 
 	select {
-	case <-time.After(800 * time.Second):
+	case <-time.After(1600 * time.Second):
 		if err := startEmulatorCmd.Process.Kill(); err != nil {
-			log.Error("Failed to kill emulator command, error: %s", err)
-			os.Exit(1)
+			failf("Failed to kill emulator command, error: %s", err)
 		}
 
-		log.Error("Start emulator timed out")
-		os.Exit(1)
+		failf("Start emulator timed out")
 	case err := <-e:
 		if err != nil {
-			log.Error("Failed to start emultor, error: %s", err)
-			os.Exit(1)
+			failf("Failed to start emultor, error: %s", err)
 		}
 
 	}
 	// ---
 
 	if err := exportEnvironmentWithEnvman("BITRISE_EMULATOR_SERIAL", serial); err != nil {
-		log.Warn("Failed to export environment (BITRISE_EMULATOR_SERIAL), error: %s", err)
+		log.Warnf("Failed to export environment (BITRISE_EMULATOR_SERIAL), error: %s", err)
 	}
 
 	fmt.Println()
-	log.Done("Emulator (%s) booted", serial)
+	log.Donef("Emulator (%s) booted", serial)
 }

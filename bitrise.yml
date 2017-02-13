@@ -1,38 +1,15 @@
-format_version: 1.1.0
+format_version: 1.3.1
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 app:
   envs:
   - RELEASE_VERSION: 1.1.0
 
-  - EMULATOR_NAME: Nexus_5_API_23
-  - EMULATOR_SKIN: 768x1280
-  - EMULATOR_OPTIONS: "-gpu on"
+  - BITRISE_EMULATOR_NAME: Nexus_4_API_23
 
 workflows:
   # ----------------------------------------------------------------
   # --- workflow to Step Test
-  test:
-    before_run:
-    - go-tests
-    steps:
-    - change-workdir:
-        title: Change workdir
-        inputs:
-        - path: ./_tmp
-    - path::./:
-        title: Step test
-        inputs:
-        - emulator_name: $EMULATOR_NAME
-        - skin: $EMULATOR_SKIN
-        - emulator_options: $EMULATOR_OPTIONS
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |
-            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
-
   ci:
     before_run:
     - go-tests
@@ -44,50 +21,10 @@ workflows:
     # ---
     - create-android-emulator:
         title: Create android-23-armeabi-v7a
+        run_if: .IsCI
         inputs:
         - name: android-23-armeabi-v7a
         - platform: android-23
-    - path::./:
-        title: Step test
-        inputs:
-        - emulator_name: $BITRISE_EMULATOR_NAME
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |
-            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
-    - script:
-        title: Stop Android Emulator
-        inputs:
-        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
-    # ---
-    - create-android-emulator:
-        title: Create android-23-armeabi-v7a
-        inputs:
-        - name: android-23-armeabi-v7a
-        - platform: android-23
-    - path::./:
-        title: Step test
-        inputs:
-        - emulator_name: $BITRISE_EMULATOR_NAME
-        - emulator_options: "-gpu on"
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |
-            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
-    - script:
-        title: Stop Android Emulator
-        inputs:
-        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
-    # ---
-    - create-android-emulator:
-        title: Create android-21-armeabi-v7a
-        inputs:
-        - name: android-21-armeabi-v7a
-        - platform: android-21
     - path::./:
         title: Step test
         inputs:

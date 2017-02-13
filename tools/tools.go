@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/bitrise-io/go-utils/cmdex"
+	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/pathutil"
 )
 
@@ -28,25 +28,25 @@ func NewADB(androidHomeDir string) (*ADBModel, error) {
 }
 
 // DevicesCmd ...
-func (adb ADBModel) DevicesCmd() *cmdex.CommandModel {
-	return cmdex.NewCommand(adb.pth, "devices")
+func (adb ADBModel) DevicesCmd() *command.Model {
+	return command.New(adb.pth, "devices")
 }
 
 // IsDeviceBooted ...
 func (adb ADBModel) IsDeviceBooted(serial string) (bool, error) {
-	devBootCmd := cmdex.NewCommand(adb.pth, "-s", serial, "shell", "getprop dev.bootcomplete")
+	devBootCmd := command.New(adb.pth, "-s", serial, "shell", "getprop dev.bootcomplete")
 	devBootOut, err := devBootCmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return false, err
 	}
 
-	sysBootCmd := cmdex.NewCommand(adb.pth, "-s", serial, "shell", "getprop sys.boot_completed")
+	sysBootCmd := command.New(adb.pth, "-s", serial, "shell", "getprop sys.boot_completed")
 	sysBootOut, err := sysBootCmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return false, err
 	}
 
-	bootAnimCmd := cmdex.NewCommand(adb.pth, "-s", serial, "shell", "getprop init.svc.bootanim")
+	bootAnimCmd := command.New(adb.pth, "-s", serial, "shell", "getprop init.svc.bootanim")
 	bootAnimOut, err := bootAnimCmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
 		return false, err
@@ -57,12 +57,12 @@ func (adb ADBModel) IsDeviceBooted(serial string) (bool, error) {
 
 // UnlockDevice ...
 func (adb ADBModel) UnlockDevice(serial string) error {
-	keyEvent82Cmd := cmdex.NewCommand(adb.pth, "-s", serial, "shell", "input", "82", "&")
+	keyEvent82Cmd := command.New(adb.pth, "-s", serial, "shell", "input", "82", "&")
 	if err := keyEvent82Cmd.Run(); err != nil {
 		return err
 	}
 
-	keyEvent1Cmd := cmdex.NewCommand(adb.pth, "-s", serial, "shell", "input", "1", "&")
+	keyEvent1Cmd := command.New(adb.pth, "-s", serial, "shell", "input", "1", "&")
 	return keyEvent1Cmd.Run()
 }
 
@@ -88,7 +88,7 @@ func NewEmulator(androidHomeDir string) (*EmulatorModel, error) {
 }
 
 // StartEmulatorCmd ...
-func (emulator EmulatorModel) StartEmulatorCmd(name, skin string, options ...string) *cmdex.CommandModel {
+func (emulator EmulatorModel) StartEmulatorCmd(name, skin string, options ...string) *command.Model {
 	args := []string{emulator.pth, "-avd", name}
 	if len(skin) == 0 {
 		args = append(args, "-noskin")
@@ -98,5 +98,5 @@ func (emulator EmulatorModel) StartEmulatorCmd(name, skin string, options ...str
 
 	args = append(args, options...)
 
-	return cmdex.NewCommand(args[0], args[1:]...)
+	return command.New(args[0], args[1:]...)
 }
