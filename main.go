@@ -321,7 +321,9 @@ func main() {
 				bootInProgress = !booted
 			}
 
-			adb.UnlockDevice(serial)
+			if err := adb.UnlockDevice(serial); err != nil {
+				failf("UnlockDevice command failed, error: %s", err)
+			}
 
 			log.Donef("> Device booted")
 		}
