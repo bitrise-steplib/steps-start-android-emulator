@@ -11,9 +11,18 @@ project_type_tags:
   - android
 type_tags:
   - emulator
-is_requires_admin_user: false
+is_requires_admin_user: true
 is_always_run: false
 is_skippable: false
+deps:
+  brew:
+  - name: go
+  apt_get:
+  - name: golang
+    bin_name: go
+toolkit:
+  go:
+    package_name: github.com/bitrise-steplib/steps-start-android-emulator
 inputs:
   - emulator_name: $BITRISE_EMULATOR_NAME
     opts:
@@ -27,7 +36,7 @@ inputs:
       description: |
         Use this input to specify an emulator skin.
         Value example: `768x1280`.
-  - emulator_options: "-no-boot-anim -no-audio -no-window"
+  - emulator_options: "-no-boot-anim -no-window"
     opts:
       title: Specify emulator command's flags
       description: |-
