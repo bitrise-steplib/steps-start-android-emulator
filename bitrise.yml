@@ -33,8 +33,12 @@ workflows:
         title: Output test
         is_always_run: true
         inputs:
-        - content: |
-            echo "BITRISE_EMULATOR_SERIAL: $BITRISE_EMULATOR_SERIAL"
+        - content: |-
+            #!/bin/bash
+            set -ex
+            if [ -z "$BITRISE_EMULATOR_SERIAL" ]; then exit 1; fi
+            if [[ $(adb devices | grep $BITRISE_EMULATOR_SERIAL) = "" ]]; then exit 1; fi
+            echo "BITRISE_EMULATOR_SERIAL: ${BITRISE_EMULATOR_SERIAL}"
     - script:
         title: Stop Android Emulator
         inputs:

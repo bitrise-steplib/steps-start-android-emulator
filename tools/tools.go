@@ -57,12 +57,12 @@ func (adb ADBModel) IsDeviceBooted(serial string) (bool, error) {
 
 // UnlockDevice ...
 func (adb ADBModel) UnlockDevice(serial string) error {
-	keyEvent82Cmd := command.New(adb.pth, "-s", serial, "shell", "input", "82", "&")
+	keyEvent82Cmd := command.New(adb.pth, "-s", serial, "shell", "input keyevent 82 &")
 	if err := keyEvent82Cmd.Run(); err != nil {
 		return err
 	}
 
-	keyEvent1Cmd := command.New(adb.pth, "-s", serial, "shell", "input", "1", "&")
+	keyEvent1Cmd := command.New(adb.pth, "-s", serial, "shell", "input keyevent 1 &")
 	return keyEvent1Cmd.Run()
 }
 

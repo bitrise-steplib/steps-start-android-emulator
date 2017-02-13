@@ -1,7 +1,7 @@
 title: Start Android emulator
 summary: Start Android emulator and wait till it's booted fully.
 description: |-
-  Start Android emulator and wait till it's booted fully.
+  Start Android emulator and - optionally - wait till it's booted fully.
 website: https://github.com/bitrise-steplib/steps-start-android-emulator
 source_code_url: https://github.com/bitrise-steplib/steps-start-android-emulator
 support_url: https://github.com/bitrise-steplib/steps-start-android-emulator/issues
@@ -46,6 +46,14 @@ inputs:
       title: Android sdk path
       description: Android sdk path
       is_required: true
+  - wait_for_boot: "true"
+    opts:
+      title: Wait for emulator boot
+      description: If this option is false, the step will not wait for the emulator to finish boot
+      is_required: true
+      value_options:
+      - "true"
+      - "false"
   - other_options: ""
     opts:
       title: "[Deprecated!] Additional options for emulator call"
