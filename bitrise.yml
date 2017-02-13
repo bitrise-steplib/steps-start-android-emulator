@@ -20,11 +20,11 @@ workflows:
         - path: ./_tmp
     # ---
     - create-android-emulator:
-        title: Create android-23-armeabi-v7a
+        title: Create android-22-armeabi-v7a
         run_if: .IsCI
         inputs:
-        - name: android-23-armeabi-v7a
-        - platform: android-23
+        - name: android-22-armeabi-v7a
+        - platform: android-22
     - path::./:
         title: Step test
         inputs:
