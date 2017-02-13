@@ -1,6 +1,12 @@
-## Changelog (Current version: 1.1.0)
+## Changelog (Current version: 1.1.1)
 
 -----------------
+
+### 1.1.1 (2017 Feb 13)
+
+* [5bf0fb8] Prepare for 1.1.1
+* [0c49ae0] Added wait_for_boot option (#28)
+* [506865f] go-toolkit (#26)
 
 ### 1.1.0 (2016 Aug 24)
 
@@ -88,4 +94,4 @@
 
 -----------------
 
-Updated: 2016 Aug 24
+Updated: 2017 Feb 13
