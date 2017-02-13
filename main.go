@@ -24,6 +24,7 @@ type ConfigsModel struct {
 	Skin            string
 	EmulatorOptions string
 	AndroidHome     string
+	WaitForBoot     string
 }
 
 func createConfigsModelFromEnvs() ConfigsModel {
@@ -32,6 +33,7 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		Skin:            os.Getenv("skin"),
 		EmulatorOptions: os.Getenv("emulator_options"),
 		AndroidHome:     os.Getenv("android_home"),
+		WaitForBoot:     os.Getenv("wait_for_boot"),
 	}
 }
 
@@ -41,6 +43,7 @@ func (configs ConfigsModel) print() {
 	log.Printf("- Skin: %s", configs.Skin)
 	log.Printf("- EmulatorOptions: %s", configs.EmulatorOptions)
 	log.Printf("- AndroidHome: %s", configs.AndroidHome)
+	log.Printf("- WaitForBoot: %s", configs.WaitForBoot)
 }
 
 func (configs ConfigsModel) validate() error {
@@ -49,6 +52,9 @@ func (configs ConfigsModel) validate() error {
 	}
 	if configs.AndroidHome == "" {
 		return errors.New("no AndroidHome parameter specified")
+	}
+	if configs.WaitForBoot == "" {
+		return errors.New("no WaitForBoot parameter specified")
 	}
 	if exist, err := pathutil.IsPathExists(configs.AndroidHome); err != nil {
 		return fmt.Errorf("failed to check if android home exist, error: %s", err)
@@ -299,23 +305,23 @@ func main() {
 		log.Donef("> Started device serial: %s", serial)
 
 		// Wait until device is booted
-		bootInProgress := true
-		for bootInProgress {
-			time.Sleep(5 * time.Second)
+		if configs.WaitForBoot == "true" {
+			bootInProgress := true
+			for bootInProgress {
+				time.Sleep(5 * time.Second)
 
-			log.Printf("> Checking if device booted...")
+				log.Printf("> Checking if device booted...")
 
-			booted, err := adb.IsDeviceBooted(serial)
-			if err != nil {
-				e <- err
-				return
+				booted, err := adb.IsDeviceBooted(serial)
+				if err != nil {
+					e <- err
+					return
+				}
+
+				bootInProgress = !booted
 			}
-
-			bootInProgress = !booted
+			log.Donef("> Device booted")
 		}
-
-		log.Donef("> Device booted")
-
 		e <- nil
 	}()
 
