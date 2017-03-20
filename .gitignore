@@ -1,5 +1,4 @@
 emulator.log
 .bitrise.secrets.yml
 .idea/
-
-
+.gows*

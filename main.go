@@ -14,7 +14,8 @@ import (
 	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
-	"github.com/bitrise-steplib/steps-start-android-emulator/tools"
+	"github.com/bitrise-tools/go-android/adbmanager"
+	"github.com/bitrise-tools/go-android/emulatormanager"
 	"github.com/kballard/go-shellquote"
 )
 
@@ -112,7 +113,7 @@ func currentlyStartedDeviceSerial(alreadyRunningDeviceInfos, currentlyRunningDev
 	return ""
 }
 
-func runningDeviceInfos(adb tools.ADBModel) (map[string]string, error) {
+func runningDeviceInfos(adb adbmanager.Model) (map[string]string, error) {
 	cmd := adb.DevicesCmd()
 	out, err := cmd.RunAndReturnTrimmedCombinedOutput()
 	if err != nil {
@@ -192,7 +193,7 @@ func main() {
 	log.Donef("AVD image (%s) exist", configs.EmulatorName)
 	// ---
 
-	adb, err := tools.NewADB(configs.AndroidHome)
+	adb, err := adbmanager.New(configs.AndroidHome)
 	if err != nil {
 		failf("Failed to create adb model, error: %s", err)
 	}
@@ -214,7 +215,7 @@ func main() {
 	}
 	// ---
 
-	emulator, err := tools.NewEmulator(configs.AndroidHome)
+	emulator, err := emulatormanager.New(configs.AndroidHome)
 	if err != nil {
 		failf("Failed to create emulator model, error: %s", err)
 	}
@@ -233,7 +234,7 @@ func main() {
 		options = split
 	}
 
-	startEmulatorCommand := emulator.StartEmulatorCmd(configs.EmulatorName, configs.Skin, options...)
+	startEmulatorCommand := emulator.StartEmulatorCommand(configs.EmulatorName, configs.Skin, options...)
 	startEmulatorCmd := startEmulatorCommand.GetCmd()
 
 	e := make(chan error)
