@@ -32,11 +32,11 @@
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/adbmanager",
-			"Rev": "bb0d163c44ca84d003521ae9df41469e590f66e4"
+			"Rev": "03848c8e224f8701eac5b3d7b8ec01884c961026"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/emulatormanager",
-			"Rev": "bb0d163c44ca84d003521ae9df41469e590f66e4"
+			"Rev": "03848c8e224f8701eac5b3d7b8ec01884c961026"
 		},
 		{
 			"ImportPath": "github.com/kballard/go-shellquote",
