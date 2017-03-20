@@ -7,10 +7,8 @@ source_code_url: https://github.com/bitrise-steplib/steps-start-android-emulator
 support_url: https://github.com/bitrise-steplib/steps-start-android-emulator/issues
 host_os_tags:
   - ubuntu
-project_type_tags:
-  - android
 type_tags:
-  - emulator
+  - utility
 is_requires_admin_user: true
 is_always_run: false
 is_skippable: false
