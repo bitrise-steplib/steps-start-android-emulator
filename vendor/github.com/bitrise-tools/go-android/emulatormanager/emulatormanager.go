@@ -16,9 +16,21 @@ type Model struct {
 
 // New ...
 func New(androidHome string) (*Model, error) {
-	binPth := filepath.Join(androidHome, "tools", "emulator")
-	if runtime.GOOS == "linux" {
-		binPth = filepath.Join(androidHome, "tools", "emulator64-arm")
+	if exist, err := pathutil.IsDirExists(androidHome); err != nil {
+		return nil, err
+	} else if !exist {
+		return nil, fmt.Errorf("android home not exists at: %s", androidHome)
+	}
+
+	binPth := filepath.Join(androidHome, "emulator", "emulator")
+	exist, err := pathutil.IsPathExists(binPth)
+	if err != nil {
+		return nil, err
+	} else if !exist {
+		binPth = filepath.Join(androidHome, "tools", "emulator")
+		if runtime.GOOS == "linux" {
+			binPth = filepath.Join(androidHome, "tools", "emulator64-arm")
+		}
 	}
 
 	if exist, err := pathutil.IsPathExists(binPth); err != nil {
