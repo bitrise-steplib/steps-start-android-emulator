@@ -1,6 +1,12 @@
-## Changelog (Current version: 1.1.1)
+## Changelog (Current version: 1.2.0)
 
 -----------------
+
+### 1.2.0 (2017 Mar 22)
+
+* [cfbd93c] prepare for 1.2.0
+* [ef77fa1] bitrise.yml update
+* [34ed7a6] use go-android packages (#30)
 
 ### 1.1.1 (2017 Feb 13)
 
@@ -94,4 +100,4 @@
 
 -----------------
 
-Updated: 2017 Feb 13
+Updated: 2017 Mar 22
