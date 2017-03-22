@@ -5,7 +5,9 @@ app:
   envs:
   - RELEASE_VERSION: 1.1.1
 
-  - BITRISE_EMULATOR_NAME: Nexus_4_API_23
+  - BITRISE_EMULATOR_NAME: android-22-armeabi-v7a
+  - EMULATOR_PLATFORM: android-22
+  - EMULATOR_TAG: google_apis
 
 workflows:
   # ----------------------------------------------------------------
@@ -19,12 +21,13 @@ workflows:
         inputs:
         - path: ./_tmp
     # ---
-    - create-android-emulator:
-        title: Create android-22-armeabi-v7a
-        run_if: .IsCI
+    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@master:
+        title: Create emulator
+        # run_if: .IsCI
         inputs:
-        - name: android-22-armeabi-v7a
-        - platform: android-22
+        - name: $BITRISE_EMULATOR_NAME
+        - platform: $EMULATOR_PLATFORM
+        - tag: $EMULATOR_TAG
     - path::./:
         title: Step test
         inputs:
