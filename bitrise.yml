@@ -21,7 +21,7 @@ workflows:
         inputs:
         - path: ./_tmp
     # ---
-    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@master:
+    - create-android-emulator:
         title: Create emulator
         # run_if: .IsCI
         inputs:
