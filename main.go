@@ -16,6 +16,7 @@ import (
 	"github.com/bitrise-io/go-utils/sliceutil"
 	"github.com/bitrise-tools/go-android/adbmanager"
 	"github.com/bitrise-tools/go-android/emulatormanager"
+	"github.com/bitrise-tools/go-android/sdk"
 	"github.com/kballard/go-shellquote"
 )
 
@@ -193,7 +194,12 @@ func main() {
 	log.Donef("AVD image (%s) exist", configs.EmulatorName)
 	// ---
 
-	adb, err := adbmanager.New(configs.AndroidHome)
+	androidSdk, err := sdk.New(configs.AndroidHome)
+	if err != nil {
+		failf("Failed to create sdk, error: %s", err)
+	}
+
+	adb, err := adbmanager.New(androidSdk)
 	if err != nil {
 		failf("Failed to create adb model, error: %s", err)
 	}
@@ -215,7 +221,7 @@ func main() {
 	}
 	// ---
 
-	emulator, err := emulatormanager.New(configs.AndroidHome)
+	emulator, err := emulatormanager.New(androidSdk)
 	if err != nil {
 		failf("Failed to create emulator model, error: %s", err)
 	}
