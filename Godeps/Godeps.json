@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/bitrise-steplib/steps-start-android-emulator",
-	"GoVersion": "go1.8",
+	"GoVersion": "go1.7",
 	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
@@ -8,35 +8,39 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/colorstring",
-			"Rev": "477d758d7497458ddbec25bec4a8d107bbe0404d"
+			"Rev": "5863e947430502abe15cb53a93e955259728ff66"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/command",
-			"Rev": "477d758d7497458ddbec25bec4a8d107bbe0404d"
+			"Rev": "5863e947430502abe15cb53a93e955259728ff66"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
-			"Rev": "477d758d7497458ddbec25bec4a8d107bbe0404d"
+			"Rev": "5863e947430502abe15cb53a93e955259728ff66"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/log",
-			"Rev": "477d758d7497458ddbec25bec4a8d107bbe0404d"
+			"Rev": "5863e947430502abe15cb53a93e955259728ff66"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
-			"Rev": "477d758d7497458ddbec25bec4a8d107bbe0404d"
+			"Rev": "5863e947430502abe15cb53a93e955259728ff66"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/sliceutil",
-			"Rev": "477d758d7497458ddbec25bec4a8d107bbe0404d"
+			"Rev": "5863e947430502abe15cb53a93e955259728ff66"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/adbmanager",
-			"Rev": "82f09a892ba1162f8e81cb9f2ccfd2a42cecd070"
+			"Rev": "e5ba0b957d033f5e03bdaac0787baa1d476527c4"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/emulatormanager",
-			"Rev": "82f09a892ba1162f8e81cb9f2ccfd2a42cecd070"
+			"Rev": "e5ba0b957d033f5e03bdaac0787baa1d476527c4"
+		},
+		{
+			"ImportPath": "github.com/bitrise-tools/go-android/sdk",
+			"Rev": "e5ba0b957d033f5e03bdaac0787baa1d476527c4"
 		},
 		{
 			"ImportPath": "github.com/kballard/go-shellquote",
