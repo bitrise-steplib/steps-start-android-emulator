@@ -13,18 +13,11 @@ import (
 // Model ...
 type Model struct {
 	binPth string
-	env    string
 }
 
 // New ...
 func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
 	binPth := filepath.Join(sdk.GetAndroidHome(), "emulator", "emulator")
-	env := ""
-	if runtime.GOOS == "linux" {
-		binPth = filepath.Join(sdk.GetAndroidHome(), "emulator", "emulator64-arm")
-		env = "LD_LIBRARY_PATH=" + filepath.Join(sdk.GetAndroidHome(), "emulator", "lib64", "qt", "lib")
-	}
-
 	exist, err := pathutil.IsPathExists(binPth)
 	if err != nil {
 		return nil, err
@@ -43,7 +36,6 @@ func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
 
 	return &Model{
 		binPth: binPth,
-		env: env,
 	}, nil
 }
 
@@ -59,5 +51,5 @@ func (model Model) StartEmulatorCommand(name, skin string, options ...string) *c
 
 	args = append(args, options...)
 
-	return command.New(args[0], args[1:]...).AppendEnvs(model.env)
+	return command.New(args[0], args[1:]...)
 }
