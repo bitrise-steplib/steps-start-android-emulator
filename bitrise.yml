@@ -5,27 +5,43 @@ app:
   envs:
   - RELEASE_VERSION: 1.2.1
 
-  - BITRISE_EMULATOR_NAME: android-25-armeabi-v7a
-  - EMULATOR_PLATFORM: android-25
-  - BITRISE_EMULATOR_NAME19: android-19-armeabi-v7a
-  - EMULATOR_PLATFORM19: android-19
-  - BITRISE_EMULATOR_NAME24: android-24-armeabi-v7a
-  - EMULATOR_PLATFORM24: android-24
-  - EMULATOR_TAG: google_apis
-  - EMULATOR_TAG_DEF: default
-
 workflows:
   # ----------------------------------------------------------------
   # --- workflow to Step Test
   ci:
     before_run:
     - go-tests
+    after_run:
+    - test-android-25
+    - test-android-19
+    - test-android-24
+
+  test-android-25:
+    envs:
+    - BITRISE_EMULATOR_NAME: android-25-armeabi-v7a
+    - EMULATOR_PLATFORM: android-25
+    - EMULATOR_TAG: google_apis
+    after_run:
+    - _common
+
+  test-android-19:
+    envs:
+    - BITRISE_EMULATOR_NAME: android-19-armeabi-v7a
+    - EMULATOR_PLATFORM: android-19
+    - EMULATOR_TAG: default
+    after_run:
+    - _common
+
+  test-android-24:
+    envs:
+    - BITRISE_EMULATOR_NAME: android-24-armeabi-v7a
+    - EMULATOR_PLATFORM: android-24
+    - EMULATOR_TAG: google_apis
+    after_run:
+    - _common
+
+  _common:
     steps:
-    - change-workdir:
-        title: Change workdir
-        inputs:
-        - path: ./_tmp
-    # ---
     - create-android-emulator:
         title: Create emulator
         # run_if: .IsCI
@@ -37,58 +53,6 @@ workflows:
         title: Step test
         inputs:
         - emulator_name: $BITRISE_EMULATOR_NAME
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -ex
-            if [ -z "$BITRISE_EMULATOR_SERIAL" ]; then exit 1; fi
-            if [[ $(adb devices | grep $BITRISE_EMULATOR_SERIAL) = "" ]]; then exit 1; fi
-            echo "BITRISE_EMULATOR_SERIAL: ${BITRISE_EMULATOR_SERIAL}"
-    - script:
-        title: Stop Android Emulator
-        inputs:
-        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
-    # ---
-    - create-android-emulator:
-        title: Create emulator
-        # run_if: .IsCI
-        inputs:
-        - name: $BITRISE_EMULATOR_NAME19
-        - platform: $EMULATOR_PLATFORM19
-        - tag: $EMULATOR_TAG_DEF
-    - path::./:
-        title: Step test
-        inputs:
-        - emulator_name: $BITRISE_EMULATOR_NAME19
-    - script:
-        title: Output test
-        is_always_run: true
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -ex
-            if [ -z "$BITRISE_EMULATOR_SERIAL" ]; then exit 1; fi
-            if [[ $(adb devices | grep $BITRISE_EMULATOR_SERIAL) = "" ]]; then exit 1; fi
-            echo "BITRISE_EMULATOR_SERIAL: ${BITRISE_EMULATOR_SERIAL}"
-    - script:
-        title: Stop Android Emulator
-        inputs:
-        - content: adb -s $BITRISE_EMULATOR_SERIAL emu kill
-    # ---
-    - create-android-emulator:
-        title: Create emulator
-        # run_if: .IsCI
-        inputs:
-        - name: $BITRISE_EMULATOR_NAME24
-        - platform: $EMULATOR_PLATFORM24
-        - tag: $EMULATOR_TAG
-    - path::./:
-        title: Step test
-        inputs:
-        - emulator_name: $BITRISE_EMULATOR_NAME24
     - script:
         title: Output test
         is_always_run: true
