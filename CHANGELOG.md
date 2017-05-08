@@ -1,6 +1,12 @@
-## Changelog (Current version: 1.2.1)
+## Changelog (Current version: 1.3.0)
 
 -----------------
+
+### 1.3.0 (2017 May 08)
+
+* [523560e] Prepare for 1.3.0
+* [466a408] Godeps-update (#34)
+* [bcb124c] Fixed emulator start on Google APIs level 25 system image (#32)
 
 ### 1.2.1 (2017 Mar 29)
 
@@ -105,4 +111,4 @@
 
 -----------------
 
-Updated: 2017 Mar 29
+Updated: 2017 May 08
