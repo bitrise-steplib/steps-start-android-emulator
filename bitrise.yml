@@ -5,8 +5,8 @@ app:
   envs:
   - RELEASE_VERSION: 1.2.1
 
-  - BITRISE_EMULATOR_NAME: android-22-armeabi-v7a
-  - EMULATOR_PLATFORM: android-22
+  - BITRISE_EMULATOR_NAME: android-25-armeabi-v7a
+  - EMULATOR_PLATFORM: android-25
   - EMULATOR_TAG: google_apis
 
 workflows:
