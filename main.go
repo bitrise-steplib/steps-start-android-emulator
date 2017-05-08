@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -27,6 +28,7 @@ type ConfigsModel struct {
 	EmulatorOptions string
 	AndroidHome     string
 	WaitForBoot     string
+	BootTimeout     string
 }
 
 func createConfigsModelFromEnvs() ConfigsModel {
@@ -36,6 +38,7 @@ func createConfigsModelFromEnvs() ConfigsModel {
 		EmulatorOptions: os.Getenv("emulator_options"),
 		AndroidHome:     os.Getenv("android_home"),
 		WaitForBoot:     os.Getenv("wait_for_boot"),
+		BootTimeout:     os.Getenv("boot_timeout"),
 	}
 }
 
@@ -46,6 +49,7 @@ func (configs ConfigsModel) print() {
 	log.Printf("- EmulatorOptions: %s", configs.EmulatorOptions)
 	log.Printf("- AndroidHome: %s", configs.AndroidHome)
 	log.Printf("- WaitForBoot: %s", configs.WaitForBoot)
+	log.Printf("- BootTimeout: %s", configs.BootTimeout)
 }
 
 func (configs ConfigsModel) validate() error {
@@ -57,6 +61,9 @@ func (configs ConfigsModel) validate() error {
 	}
 	if configs.WaitForBoot == "" {
 		return errors.New("no WaitForBoot parameter specified")
+	}
+	if configs.BootTimeout == "" {
+		return errors.New("no BootTimeout parameter specified")
 	}
 	if exist, err := pathutil.IsPathExists(configs.AndroidHome); err != nil {
 		return fmt.Errorf("failed to check if android home exist, error: %s", err)
@@ -337,8 +344,13 @@ func main() {
 		e <- nil
 	}()
 
+	timeout, err := strconv.ParseInt(configs.BootTimeout, 10, 64)
+	if err != nil {
+		failf("Failed to parse BootTimeout parameter, error: %s", err)
+	}
+
 	select {
-	case <-time.After(1600 * time.Second):
+	case <-time.After(time.Duration(timeout) * time.Second):
 		if err := startEmulatorCmd.Process.Kill(); err != nil {
 			failf("Failed to kill emulator command, error: %s", err)
 		}

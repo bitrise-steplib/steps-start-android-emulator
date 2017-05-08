@@ -5,22 +5,43 @@ app:
   envs:
   - RELEASE_VERSION: 1.2.1
 
-  - BITRISE_EMULATOR_NAME: android-25-armeabi-v7a
-  - EMULATOR_PLATFORM: android-25
-  - EMULATOR_TAG: google_apis
-
 workflows:
   # ----------------------------------------------------------------
   # --- workflow to Step Test
   ci:
     before_run:
     - go-tests
+    after_run:
+    - test-android-25
+    - test-android-19
+    - test-android-24
+
+  test-android-25:
+    envs:
+    - BITRISE_EMULATOR_NAME: android-25-armeabi-v7a
+    - EMULATOR_PLATFORM: android-25
+    - EMULATOR_TAG: google_apis
+    after_run:
+    - _common
+
+  test-android-19:
+    envs:
+    - BITRISE_EMULATOR_NAME: android-19-armeabi-v7a
+    - EMULATOR_PLATFORM: android-19
+    - EMULATOR_TAG: default
+    after_run:
+    - _common
+
+  test-android-24:
+    envs:
+    - BITRISE_EMULATOR_NAME: android-24-armeabi-v7a
+    - EMULATOR_PLATFORM: android-24
+    - EMULATOR_TAG: google_apis
+    after_run:
+    - _common
+
+  _common:
     steps:
-    - change-workdir:
-        title: Change workdir
-        inputs:
-        - path: ./_tmp
-    # ---
     - create-android-emulator:
         title: Create emulator
         # run_if: .IsCI

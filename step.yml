@@ -52,6 +52,13 @@ inputs:
       value_options:
       - "true"
       - "false"
+  - boot_timeout: "1600"
+    opts:
+      title: "Waiting timeout (secs)"
+      summary: Maximum time to wait for emulator to boot
+      description: |
+        Maximum time to wait for emulator to boot.
+      is_required: true
   - other_options: ""
     opts:
       title: "[Deprecated!] Additional options for emulator call"
