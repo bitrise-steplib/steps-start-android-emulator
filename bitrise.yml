@@ -12,6 +12,7 @@ app:
   - BITRISE_EMULATOR_NAME24: android-24-armeabi-v7a
   - EMULATOR_PLATFORM24: android-24
   - EMULATOR_TAG: google_apis
+  - EMULATOR_TAG_DEF: default
 
 workflows:
   # ----------------------------------------------------------------
@@ -57,7 +58,7 @@ workflows:
         inputs:
         - name: $BITRISE_EMULATOR_NAME19
         - platform: $EMULATOR_PLATFORM19
-        - tag: $EMULATOR_TAG
+        - tag: $EMULATOR_TAG_DEF
     - path::./:
         title: Step test
         inputs:
