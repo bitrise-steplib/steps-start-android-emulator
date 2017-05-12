@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/bitrise-io/go-utils/command"
+	"github.com/bitrise-io/go-utils/log"
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-tools/go-android/sdk"
 )
@@ -13,48 +15,79 @@ import (
 // Model ...
 type Model struct {
 	binPth string
-	env    string
+	envs   []string
+}
+
+func emulatorBinPth(androidHome string) (string, error) {
+	binPth := filepath.Join(androidHome, "emulator", "emulator64-arm")
+	if exist, err := pathutil.IsPathExists(binPth); err != nil {
+		return "", err
+	} else if !exist {
+		binPth = filepath.Join(androidHome, "emulator", "emulator")
+		if exist, err := pathutil.IsPathExists(binPth); err != nil {
+			return "", err
+		} else if !exist {
+			return "", fmt.Errorf("no emulator binary found in $ANDROID_HOME/emulator")
+		}
+	}
+	return binPth, nil
+}
+
+func lib64QTLibEnv(androidHome, hostOSName string) (string, error) {
+	envKey := ""
+	libPth := filepath.Join(androidHome, "emulator", "lib64", "qt", "lib")
+
+	if hostOSName == "linux" {
+		envKey = "LD_LIBRARY_PATH"
+	} else if hostOSName == "darwin" {
+		envKey = "DYLD_LIBRARY_PATH"
+	} else {
+		return "", fmt.Errorf("unsupported os %s", hostOSName)
+	}
+
+	if exist, err := pathutil.IsPathExists(libPth); err != nil {
+		return "", err
+	} else if !exist {
+		return "", fmt.Errorf("qt lib does not exist at: %s", libPth)
+	}
+
+	return envKey + "=" + libPth, nil
 }
 
 // New ...
 func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
-	binPth := filepath.Join(sdk.GetAndroidHome(), "emulator", "emulator64-arm")
-
-	env := ""
-	if runtime.GOOS == "linux" {
-		env = "LD_LIBRARY_PATH=" + filepath.Join(sdk.GetAndroidHome(), "emulator", "lib64", "qt", "lib")
-	} else if runtime.GOOS == "darwin" {
-		env = "DYLD_LIBRARY_PATH=" + filepath.Join(sdk.GetAndroidHome(), "emulator", "lib64", "qt", "lib")
+	binPth, err := emulatorBinPth(sdk.GetAndroidHome())
+	if err != nil {
+		return nil, err
 	}
 
-	if exist, err := pathutil.IsPathExists(binPth); err != nil {
-		return nil, fmt.Errorf("failed to check if emulator exist, error: %s", err)
-	} else if !exist {
-		return nil, fmt.Errorf("emulator not exist at: %s", binPth)
+	envs := []string{}
+	if strings.HasSuffix(binPth, "emulator64-arm") {
+		env, err := lib64QTLibEnv(sdk.GetAndroidHome(), runtime.GOOS)
+		if err != nil {
+			log.Warnf("failed to get lib64 qt lib path, error: %s", err)
+		} else {
+			envs = append(envs, env)
+		}
 	}
 
 	return &Model{
 		binPth: binPth,
-		env:    env,
+		envs:   envs,
 	}, nil
 }
 
 // StartEmulatorCommand ...
 func (model Model) StartEmulatorCommand(name, skin string, options ...string) *command.Model {
 	args := []string{model.binPth, "-avd", name}
-
 	if len(skin) == 0 {
 		args = append(args, "-noskin")
 	} else {
 		args = append(args, "-skin", skin)
 	}
-
 	args = append(args, options...)
 
-	commandModel := command.New(args[0], args[1:]...)
-	if model.env != "" {
-		commandModel = command.New(args[0], args[1:]...).AppendEnvs(model.env)
-	}
+	commandModel := command.New(args[0], args[1:]...).AppendEnvs(model.envs...)
 
 	return commandModel
 }

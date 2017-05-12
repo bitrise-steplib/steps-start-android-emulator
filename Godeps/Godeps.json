@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/bitrise-steplib/steps-start-android-emulator",
-	"GoVersion": "go1.7",
+	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
@@ -32,15 +32,19 @@
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/adbmanager",
-			"Rev": "ec767b17070a5f4fb64bc3e2286b982813801d37"
+			"Rev": "eabc62357cc9163eafd274e043360d63f62a5525"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/emulatormanager",
-			"Rev": "ec767b17070a5f4fb64bc3e2286b982813801d37"
+			"Rev": "eabc62357cc9163eafd274e043360d63f62a5525"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdk",
-			"Rev": "ec767b17070a5f4fb64bc3e2286b982813801d37"
+			"Rev": "eabc62357cc9163eafd274e043360d63f62a5525"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/go-version",
+			"Rev": "03c5bf6be031b6dd45afec16b1cf94fc8938bc77"
 		},
 		{
 			"ImportPath": "github.com/kballard/go-shellquote",
