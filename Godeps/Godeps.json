@@ -32,15 +32,15 @@
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/adbmanager",
-			"Rev": "ffb12c23bdea0bdf7e69d46af97b299ab749941c"
+			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/emulatormanager",
-			"Rev": "ffb12c23bdea0bdf7e69d46af97b299ab749941c"
+			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdk",
-			"Rev": "ffb12c23bdea0bdf7e69d46af97b299ab749941c"
+			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-steputils/tools",
