@@ -18,16 +18,31 @@ type Model struct {
 	envs   []string
 }
 
-func emulatorBinPth(androidHome string) (string, error) {
-	binPth := filepath.Join(androidHome, "emulator", "emulator64-arm")
+// IsLegacyEmulator ...
+func IsLegacyEmulator(androidHome string) (bool, error) {
+	exist, err := pathutil.IsPathExists(filepath.Join(androidHome, "emulator", "emulator"))
+	return !exist, err
+}
+
+func emulatorBinPth(androidHome string, legacyEmulator bool) (string, error) {
+	emulatorDir := filepath.Join(androidHome, "emulator")
+	if legacyEmulator {
+		emulatorDir = filepath.Join(androidHome, "tools")
+	}
+
+	binPth := filepath.Join(emulatorDir, "emulator64-arm")
 	if exist, err := pathutil.IsPathExists(binPth); err != nil {
 		return "", err
 	} else if !exist {
-		binPth = filepath.Join(androidHome, "emulator", "emulator")
+		binPth = filepath.Join(emulatorDir, "emulator")
 		if exist, err := pathutil.IsPathExists(binPth); err != nil {
 			return "", err
 		} else if !exist {
-			return "", fmt.Errorf("no emulator binary found in $ANDROID_HOME/emulator")
+			message := "no emulator binary found in $ANDROID_HOME/emulator"
+			if legacyEmulator {
+				message = "no emulator binary found in $ANDROID_HOME/tools"
+			}
+			return "", fmt.Errorf(message)
 		}
 	}
 	return binPth, nil
@@ -56,7 +71,12 @@ func lib64QTLibEnv(androidHome, hostOSName string) (string, error) {
 
 // New ...
 func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
-	binPth, err := emulatorBinPth(sdk.GetAndroidHome())
+	legacyEmulator, err := IsLegacyEmulator(sdk.GetAndroidHome())
+	if err != nil {
+		return nil, err
+	}
+
+	binPth, err := emulatorBinPth(sdk.GetAndroidHome(), legacyEmulator)
 	if err != nil {
 		return nil, err
 	}
