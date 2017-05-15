@@ -42,7 +42,7 @@ workflows:
 
   _common:
     steps:
-    - create-android-emulator:
+    - git::https://github.com/bitrise-steplib/steps-create-android-emulator.git@create-fix:
         title: Create emulator
         # run_if: .IsCI
         inputs:
