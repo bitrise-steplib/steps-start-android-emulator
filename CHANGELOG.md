@@ -1,6 +1,11 @@
-## Changelog (Current version: 1.3.0)
+## Changelog (Current version: 1.3.1)
 
 -----------------
+
+### 1.3.1 (2017 May 16)
+
+* [caad989] prepare for 1.3.1
+* [4cc63f9] Lts fix (#37)
 
 ### 1.3.0 (2017 May 08)
 
@@ -111,4 +116,4 @@
 
 -----------------
 
-Updated: 2017 May 08
+Updated: 2017 May 16

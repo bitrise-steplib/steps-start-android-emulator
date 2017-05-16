@@ -18,6 +18,7 @@ import (
 	"github.com/bitrise-tools/go-android/adbmanager"
 	"github.com/bitrise-tools/go-android/emulatormanager"
 	"github.com/bitrise-tools/go-android/sdk"
+	"github.com/bitrise-tools/go-steputils/tools"
 	"github.com/kballard/go-shellquote"
 )
 
@@ -152,12 +153,6 @@ func runningDeviceInfos(adb adbmanager.Model) (map[string]string, error) {
 	}
 
 	return deviceStateMap, nil
-}
-
-func exportEnvironmentWithEnvman(keyStr, valueStr string) error {
-	cmd := command.New("envman", "add", "--key", keyStr)
-	cmd.SetStdin(strings.NewReader(valueStr))
-	return cmd.Run()
 }
 
 func failf(format string, v ...interface{}) {
@@ -364,7 +359,7 @@ func main() {
 	}
 	// ---
 
-	if err := exportEnvironmentWithEnvman("BITRISE_EMULATOR_SERIAL", serial); err != nil {
+	if err := tools.ExportEnvironmentWithEnvman("BITRISE_EMULATOR_SERIAL", serial); err != nil {
 		log.Warnf("Failed to export environment (BITRISE_EMULATOR_SERIAL), error: %s", err)
 	}
 
