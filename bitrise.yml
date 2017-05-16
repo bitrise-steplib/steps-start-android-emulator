@@ -42,7 +42,7 @@ workflows:
 
   _common:
     steps:
-    - create-android-emulator.git:
+    - create-android-emulator:
         title: Create emulator
         # run_if: .IsCI
         inputs:
