@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/bitrise-steplib/steps-start-android-emulator",
-	"GoVersion": "go1.8",
+	"GoVersion": "go1.7",
 	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
@@ -8,43 +8,43 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/colorstring",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "ad8f0cff18a087ae94ce410d6dbd9f04bb6d6c00"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/command",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "ad8f0cff18a087ae94ce410d6dbd9f04bb6d6c00"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/errorutil",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "ad8f0cff18a087ae94ce410d6dbd9f04bb6d6c00"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/log",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "ad8f0cff18a087ae94ce410d6dbd9f04bb6d6c00"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/pathutil",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "ad8f0cff18a087ae94ce410d6dbd9f04bb6d6c00"
 		},
 		{
 			"ImportPath": "github.com/bitrise-io/go-utils/sliceutil",
-			"Rev": "c8163959178ae89a3829ce02e485eef6b2befd22"
+			"Rev": "ad8f0cff18a087ae94ce410d6dbd9f04bb6d6c00"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/adbmanager",
-			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
+			"Rev": "28b4a1fc88fcf52a346f013c5cb6bf113e9839fe"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/emulatormanager",
-			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
+			"Rev": "28b4a1fc88fcf52a346f013c5cb6bf113e9839fe"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-android/sdk",
-			"Rev": "e1eeecc944147eb67394b308278237fc3e769f78"
+			"Rev": "28b4a1fc88fcf52a346f013c5cb6bf113e9839fe"
 		},
 		{
 			"ImportPath": "github.com/bitrise-tools/go-steputils/tools",
-			"Rev": "557edc7229adb6035129176478e96616180df77c"
+			"Rev": "4648abbb44aff0929ccdd27312aa0a70077c14fc"
 		},
 		{
 			"ImportPath": "github.com/hashicorp/go-version",
