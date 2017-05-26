@@ -30,25 +30,20 @@ func emulatorBinPth(androidHome string, legacyEmulator bool) (string, error) {
 		emulatorDir = filepath.Join(androidHome, "tools")
 	}
 
-	binPth := filepath.Join(emulatorDir, "emulator64-arm")
+	binPth := filepath.Join(emulatorDir, "emulator")
 	if exist, err := pathutil.IsPathExists(binPth); err != nil {
 		return "", err
 	} else if !exist {
-		binPth = filepath.Join(emulatorDir, "emulator")
-		if exist, err := pathutil.IsPathExists(binPth); err != nil {
-			return "", err
-		} else if !exist {
-			message := "no emulator binary found in $ANDROID_HOME/emulator"
-			if legacyEmulator {
-				message = "no emulator binary found in $ANDROID_HOME/tools"
-			}
-			return "", fmt.Errorf(message)
+		message := "no emulator binary found in $ANDROID_HOME/emulator"
+		if legacyEmulator {
+			message = "no emulator binary found in $ANDROID_HOME/tools"
 		}
+		return "", fmt.Errorf(message)
 	}
 	return binPth, nil
 }
 
-func lib64QTLibEnv(androidHome, hostOSName string, legacyEmulator bool) (string, error) {
+func lib64Env(androidHome, hostOSName string, legacyEmulator bool) (string, error) {
 	envKey := ""
 
 	if hostOSName == "linux" {
@@ -64,15 +59,17 @@ func lib64QTLibEnv(androidHome, hostOSName string, legacyEmulator bool) (string,
 		emulatorDir = filepath.Join(androidHome, "tools")
 	}
 
-	libPth := filepath.Join(emulatorDir, "lib64", "qt", "lib")
+	qtLibPth := filepath.Join(emulatorDir, "lib64", "qt", "lib")
 
-	if exist, err := pathutil.IsPathExists(libPth); err != nil {
+	if exist, err := pathutil.IsPathExists(qtLibPth); err != nil {
 		return "", err
 	} else if !exist {
-		return "", fmt.Errorf("qt lib does not exist at: %s", libPth)
+		return "", fmt.Errorf("qt lib does not exist at: %s", qtLibPth)
 	}
 
-	return envKey + "=" + libPth, nil
+	libPth := filepath.Join(emulatorDir, "lib64")
+
+	return envKey + "=" + libPth + ":" + qtLibPth, nil
 }
 
 // New ...
@@ -88,8 +85,8 @@ func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
 	}
 
 	envs := []string{}
-	if strings.HasSuffix(binPth, "emulator64-arm") {
-		env, err := lib64QTLibEnv(sdk.GetAndroidHome(), runtime.GOOS, legacyEmulator)
+	if strings.HasSuffix(binPth, "emulator") {
+		env, err := lib64Env(sdk.GetAndroidHome(), runtime.GOOS, legacyEmulator)
 		if err != nil {
 			log.Warnf("failed to get lib64 qt lib path, error: %s", err)
 		} else {
