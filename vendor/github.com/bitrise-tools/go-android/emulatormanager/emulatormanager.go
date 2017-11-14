@@ -2,11 +2,11 @@ package emulatormanager
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	"strings"
-	"io/ioutil"
-	"os/user"
 
 	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/log"
@@ -57,15 +57,15 @@ func lib64Env(androidHome, hostOSName string, legacyEmulator bool) (string, erro
 	}
 
 	emulatorDir := filepath.Join(androidHome, "emulator")
-	
+
 	if legacyEmulator {
 		emulatorDir = filepath.Join(androidHome, "tools")
-                libPth := filepath.Join(emulatorDir, "lib64")
-	        if exist, err := pathutil.IsPathExists(libPth); err != nil {
-		        return "", err
-	        } else if !exist {
-		        return "", fmt.Errorf("lib64 does not exist at: %s", libPth)
-	        }		
+		libPth := filepath.Join(emulatorDir, "lib64")
+		if exist, err := pathutil.IsPathExists(libPth); err != nil {
+			return "", err
+		} else if !exist {
+			return "", fmt.Errorf("lib64 does not exist at: %s", libPth)
+		}
 		return envKey + "=" + libPth, nil
 	}
 
@@ -76,7 +76,7 @@ func lib64Env(androidHome, hostOSName string, legacyEmulator bool) (string, erro
 	} else if !exist {
 		return "", fmt.Errorf("qt lib does not exist at: %s", qtLibPth)
 	}
-	
+
 	libPth := filepath.Join(emulatorDir, "lib64")
 
 	return envKey + "=" + libPth + ":" + qtLibPth, nil
@@ -109,8 +109,8 @@ func New(sdk sdk.AndroidSdkInterface) (*Model, error) {
 			log.Warnf("Failed to determine if bash binary exists, error: %s", err)
 		} else if !exist {
 			log.Warnf("Bash binary does not exist at: %s", bashPath)
-	        }
-		envs = append(envs, "SHELL=" + bashPath)
+		}
+		envs = append(envs, "SHELL="+bashPath)
 	}
 
 	return &Model{
@@ -128,7 +128,7 @@ func isAVDarmeabiv7a(name string) bool {
 	content, err := ioutil.ReadFile(user.HomeDir + "/.android/avd/" + name + ".avd/config.ini")
 	if err != nil {
 		log.Warnf("Failed to determine AVD ABI, could not read AVD config file, error: %s", err)
-		return false		
+		return false
 	}
 	return strings.Contains(string(content), "abi.type=armeabi-v7")
 }
@@ -136,14 +136,14 @@ func isAVDarmeabiv7a(name string) bool {
 // StartEmulatorCommand ...
 func (model Model) StartEmulatorCommand(name, skin string, options ...string) *command.Model {
 	if isAVDarmeabiv7a(name) {
-                model.binPth += "64-arm"
-                if exist, err := pathutil.IsPathExists(model.binPth); err != nil {
-		        log.Warnf("Failed to determine whether emulator binary exists, error: %s", err)
-	        } else if !exist {
+		model.binPth += "64-arm"
+		if exist, err := pathutil.IsPathExists(model.binPth); err != nil {
+			log.Warnf("Failed to determine whether emulator binary exists, error: %s", err)
+		} else if !exist {
 			log.Warnf("Emulator binary does not exist at: %s", model.binPth)
 		}
-        }
-	
+	}
+
 	args := []string{model.binPth, "-avd", name}
 	if len(skin) == 0 {
 		args = append(args, "-noskin")
@@ -151,6 +151,8 @@ func (model Model) StartEmulatorCommand(name, skin string, options ...string) *c
 		args = append(args, "-skin", skin)
 	}
 	args = append(args, options...)
+
+	fmt.Printf("ENVS: %#v", model.envs)
 
 	commandModel := command.New(args[0], args[1:]...).AppendEnvs(model.envs...)
 
