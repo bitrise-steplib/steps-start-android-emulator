@@ -135,7 +135,7 @@ func isAVDarmeabiv7a(name string) bool {
 
 // StartEmulatorCommand ...
 func (model Model) StartEmulatorCommand(name, skin string, options ...string) *command.Model {
-	if isAVDarmeabiv7a(name) {
+	if isAVDarmeabiv7a(name) && runtime.GOOS != "darwin" {
 		model.binPth += "64-arm"
 		if exist, err := pathutil.IsPathExists(model.binPth); err != nil {
 			log.Warnf("Failed to determine whether emulator binary exists, error: %s", err)
