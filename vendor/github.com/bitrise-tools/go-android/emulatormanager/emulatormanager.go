@@ -152,8 +152,6 @@ func (model Model) StartEmulatorCommand(name, skin string, options ...string) *c
 	}
 	args = append(args, options...)
 
-	fmt.Printf("ENVS: %#v", model.envs)
-
 	commandModel := command.New(args[0], args[1:]...).AppendEnvs(model.envs...)
 
 	return commandModel
