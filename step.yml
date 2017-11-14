@@ -34,7 +34,7 @@ inputs:
       description: |
         Use this input to specify an emulator skin.
         Value example: `768x1280`.
-  - emulator_options: "-gpu swiftshader -no-boot-anim -no-window"
+  - emulator_options: "-no-boot-anim -no-window"
     opts:
       title: Specify emulator command's flags
       description: |-
