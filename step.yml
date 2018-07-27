@@ -47,7 +47,7 @@ inputs:
   - wait_for_boot: "true"
     opts:
       title: Wait for emulator boot
-      description: If this option is false, the step will not wait for the emulator to finish boot
+      description: If this option is set to false, the step will not wait for the emulator to finish booting
       is_required: true
       value_options:
       - "true"
@@ -55,15 +55,15 @@ inputs:
   - boot_timeout: "1600"
     opts:
       title: "Waiting timeout (secs)"
-      summary: Maximum time to wait for emulator to boot
+      summary: Maximum time to wait for the emulator to boot
       description: |
-        Maximum time to wait for emulator to boot.
+        Maximum time to wait for the emulator to boot.
       is_required: true
   - other_options: ""
     opts:
       title: "[Deprecated!] Additional options for emulator call"
       description: |-
-        This options is deprecated please use `emulator_options` instead.
+        This option is deprecated. Please use `emulator_options` instead.
         
         Options added to the end of the emulator call.
 
